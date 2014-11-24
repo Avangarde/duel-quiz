@@ -99,14 +99,24 @@ public class DuelQuizServerMain {
                 break;
 
             case "REGISTER":
+
+                user = in.readUTF(); //Obtain user (from message or protocol)
+                System.out.println("user " + user);
+                pass = in.readUTF(); //Obtain pass
+                System.out.println("pss " + pass);
+
+                output = registerUser(user, pass);
+                
+                //output = loginUser(user, pass);
                 break;
+                
             case "CHALLENGE":
                 break;
             case "RANDOMPLAY":
                 break;
             default:
                 //the message is not compliant with any other message
-                
+
                 break;
         }
 
@@ -123,6 +133,13 @@ public class DuelQuizServerMain {
     private static Boolean loginUser(String user, String pass) {
         //TODO Create a something and act on it
 
-        return true; //To change body of generated methods, choose Tools | Templates.
+        return false; //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static Boolean registerUser(String user, String pass) {
+        //TODO Create a something and act on it
+        //Verify existence in all BDs
+        //Enregistrer l'informations dans la BD
+        return true;
     }
 }
