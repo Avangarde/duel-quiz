@@ -21,7 +21,7 @@ public abstract class AbstractDataBaseDAO {
     public Connection connect() {
         try {
             System.out.print("Loading Oracle driver... ");
-            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            //DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
             System.out.println("loaded");
             // Etablissement de la connection
             System.out.print("Connecting to the database... ");

@@ -19,7 +19,7 @@ public class DuelQuizServerMain {
     public static void main(String[] args) {
 
         //Port to listen the clients
-        int PORT_LISTENER = 5001;
+        int PORT_LISTENER = 5000;
 
         Socket socket = null;
         ServerSocket serverSocket = null;
@@ -43,17 +43,17 @@ public class DuelQuizServerMain {
 
                 System.out.println("Welcome");
 
-                //Recieving protocol message from client
+                //Recieving protocol message from client/first handshake
                 String message = in.readUTF();
 
                 //Business logic
-                String response = treatMessage(message);
+                Boolean response = treatMessage(out, in, message);
 
                 //Response
                 System.out.print("Response..." + response);
 
                 //Put on out channel (to client)
-                out.writeUTF(response);
+                out.writeBoolean(response);
                 System.out.print("Sending response... ");
                 out.flush();
                 System.out.println("OK");
@@ -75,30 +75,39 @@ public class DuelQuizServerMain {
         }
     }
 
-    private static String treatMessage(String message) {
+    private static Boolean treatMessage(DataOutputStream out, DataInputStream in, String message) throws IOException {
 
         //Method to treat the incoming messages.
 
-        String output = "";
+        Boolean output = false;
 
         switch (message) {
             case "LOGIN":
-                String user = "user"; //Obtain user (from message or protocol)
-                String pass = "pass"; //Obtain pass
+
+                //out.writeUTF("Username?");
+                //System.out.print("Asking for username... ");
+                //out.flush();
+                String user = in.readUTF(); //Obtain user (from message or protocol)
+                System.out.println("user " + user);
+                String pass = in.readUTF(); //Obtain pass
+                System.out.println("pss " + pass);
 
                 output = loginUser(user, pass);
 
                 //TODO Construct a model for the user
                 //TODO Set Variables in DAO
                 break;
-                
+
             case "REGISTER":
+                break;
+            case "CHALLENGE":
+                break;
+            case "RANDOMPLAY":
                 break;
             default:
                 //the message is not compliant with any other message
-                output = "ERROR1";
+                
                 break;
-
         }
 
         return output;
@@ -111,9 +120,9 @@ public class DuelQuizServerMain {
 
     }
 
-    private static String loginUser(String user, String pass) {
+    private static Boolean loginUser(String user, String pass) {
         //TODO Create a something and act on it
 
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true; //To change body of generated methods, choose Tools | Templates.
     }
 }
