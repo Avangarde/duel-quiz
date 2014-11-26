@@ -18,28 +18,97 @@ import java.util.logging.Logger;
  */
 public class DuelQuizClientMain {
 
-    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static final BufferedReader reader
+            = new BufferedReader(new InputStreamReader(System.in));
+    private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Duel Quiz");
-        signIn();
+        int option = 0;
+        while (option != 3) {
+            mainMenu();
+            option = readInteger();
+            switch (option) {
+                case 1:
+                    signInOrSignUp(true);
+                    break;
+                case 2:
+                    System.out.println("Sign Up");
+                    signInOrSignUp(false);
+                    break;
+                case 3:
+                    System.out.println("Bye");
+                    break;
+                default:
+                    System.out.println("Invalid Option");
+                    break;
+            }
+        }
+
     }
 
-    private static void signIn() {
+    private static int readInteger() throws NumberFormatException {
+        int option = 0;
+        System.out.print("Select a number:\t");
+        try {
+            String input = reader.readLine();
+            option = Integer.parseInt(input);
+        } catch (IOException ex) {
+            Logger.getLogger(DuelQuizClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NumberFormatException ex) {
+            System.out.println("Invalid option");
+        }
+        return option;
+    }
+
+    private static void mainMenu() {
+        System.out.println(cls + "****  *****  ***** Duel Quiz *****  *****  ****");
+        System.out.println("Do you have an account ?");
+        System.out.println("1. Sign In");
+        System.out.println("2. Sign Up");
+        System.out.println("3. Exit\n");
+    }
+
+    /**
+     *
+     * @return
+     */
+    private static boolean signInOrSignUp(boolean signIn) {
         boolean signed = false;
-        while (!signed) {
+        boolean failed = false;
+        while (!signed && !failed) {
 
             Player player = getPlayer();
             PlayerController pc = new PlayerController();
-            signed = pc.login(player);
-            if (!signed) {
-                System.out.println("Cannot Login \n\t Try Again ?");
+            String msg;
+            if (signIn) {
+                signed = pc.signInorSignUp(player, true);
+                msg = "Login";
+            } else {
+                signed = pc.signInorSignUp(player, false);
+                msg = "SignUp";
+            }
+            boolean valid = false;
+            while (!signed && !failed && !valid) {
+                System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
+                System.out.println("\t1. Yes");
+                System.out.println("\t2. No\t");
+                switch (readInteger()) {
+                    case 1:
+                        valid = true;
+                        break;
+                    case 2:
+                        failed = !failed;
+                        break;
+                    default:
+                        System.out.println(cls + "Invalid Option");
+                        break;
+                }
             }
         }
-        System.out.println("Logged !");
+        return signed;
     }
 
     private static Player getPlayer() {

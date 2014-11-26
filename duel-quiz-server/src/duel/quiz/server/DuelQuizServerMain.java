@@ -133,7 +133,7 @@ public class DuelQuizServerMain {
     private static Boolean loginUser(String user, String pass) {
         //TODO Create a something and act on it
 
-        return false; //To change body of generated methods, choose Tools | Templates.
+        return true; //To change body of generated methods, choose Tools | Templates.
     }
 
     private static Boolean registerUser(String user, String pass) {
