@@ -18,7 +18,7 @@ public abstract class AbstractDataBaseDAO {
     private static final String DBUSER = "martijua";
     private static final String PASSWD = "martijua";
 
-    public Connection connect() {
+    public static Connection connect() {
         try {
             System.out.print("Loading Oracle driver... ");
             //DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
@@ -41,7 +41,7 @@ public abstract class AbstractDataBaseDAO {
      * @param c la connexion à fermer
      * @throws DAOException si problème lors de la fermeture de la connexion
      */
-    protected void closeConnection(Connection c) throws SQLException {
+    protected static void closeConnection(Connection c) throws SQLException {
         if (c != null) {
             //@TODO: See what happens in server side
             c.close();

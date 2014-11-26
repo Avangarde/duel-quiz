@@ -49,6 +49,12 @@ public class DuelQuizClientMain {
 
     }
 
+    /**
+     * Reads an integer from the console and returns it
+     *
+     * @return
+     * @throws NumberFormatException
+     */
     private static int readInteger() throws NumberFormatException {
         int option = 0;
         System.out.print("Select a number:\t");
@@ -63,6 +69,9 @@ public class DuelQuizClientMain {
         return option;
     }
 
+    /**
+     * Shows the Main Menu
+     */
     private static void mainMenu() {
         System.out.println(cls + "****  *****  ***** Duel Quiz *****  *****  ****");
         System.out.println("Do you have an account ?");
@@ -111,6 +120,11 @@ public class DuelQuizClientMain {
         return signed;
     }
 
+    /**
+     * Creates and returns a player instance
+     *
+     * @return
+     */
     private static Player getPlayer() {
         String user = new String();
         String pass = new String();
