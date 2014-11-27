@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import duel.quiz.client.view.ConsoleColors;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -48,7 +50,7 @@ public class DuelQuizClientMain {
                     System.out.println("Bye");
                     break;
                 default:
-                    System.out.println("Invalid Option");
+                    System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
                     break;
             }
         }
@@ -70,9 +72,26 @@ public class DuelQuizClientMain {
         } catch (IOException ex) {
             Logger.getLogger(DuelQuizClientMain.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NumberFormatException ex) {
-            System.out.println("Invalid option");
+            System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
         }
         return option;
+    }
+
+    /**
+     * Reads an integer from the console and returns it
+     *
+     * @return
+     * @throws NumberFormatException
+     */
+    private static String readString() {
+        String input = null;
+        System.out.print("Write your selection:\t");
+        try {
+            input = reader.readLine();
+        } catch (IOException ex) {
+            Logger.getLogger(DuelQuizClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return input;
     }
 
     /**
@@ -118,7 +137,7 @@ public class DuelQuizClientMain {
                         failed = !failed;
                         break;
                     default:
-                        System.out.println(cls + "Invalid Option");
+                        System.out.println(cls + ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
                         break;
                 }
             }
@@ -156,9 +175,11 @@ public class DuelQuizClientMain {
             System.out.println("2. See current games");
             System.out.println("3. Start a new game");
             System.out.println("4. Logout\n");
-            
+            //TODO if there is time
+            //System.out.println("5. Show statistics (maybe)\n");
+
             option = readInteger();
-            
+
             switch (option) {
                 case 1:
                     System.out.println("Notifications");
@@ -173,9 +194,11 @@ public class DuelQuizClientMain {
                     startNewGameMenu();
                     break;
                 case 4:
+
+                    //TODO do formal logout with client-server communication
                     break;
                 default:
-                    System.out.println("Invalid Option");
+                    System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
                     break;
             }
         }
@@ -186,14 +209,117 @@ public class DuelQuizClientMain {
     }
 
     private static void displayNotifications() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Notifications *****  *****  ****");
+        Integer option = 0;
+        List<String> nots = fetchNotifications();
+
+
+
+        int currentIndex = 1;
+        for (String each : nots) {
+            System.out.println(each);
+        }
+
+        System.out.println("\nPress any key to continue");
+        readInteger();
     }
 
     private static void displayCurrentGames() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Current Games *****  *****  ****");
+        Integer option = 0;
+        List<String> games = fetchCurrentGames();
+        int exit = games.size() + 1;
+        while (option != exit) {
+            System.out.println("What do you want to do?");
+
+            int currentIndex = 1;
+            for (String each : games) {
+                System.out.println(currentIndex + ", Play against " + each);
+                currentIndex++;
+            }
+
+
+            System.out.println(exit + ". Go Back\n");
+
+            option = readInteger();
+
+            if (option >= 0 && option < exit) {
+                continueAgainstPlayer(games.get(option));
+            } else if (option == exit) {
+                break;
+            } else {
+                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
+            }
+        }
     }
 
     private static void startNewGameMenu() {
+        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Start a New Game *****  *****  ****");
+        Integer option = 0;
+
+        while (option != 3) {
+            System.out.println("What do you want to do?");
+
+            System.out.println("1. New random player");
+            System.out.println("2. Challenge a friend");
+            System.out.println("3. Go Back\n");
+
+            option = readInteger();
+
+            switch (option) {
+                case 1:
+                    System.out.println("Random Challenge");
+                    randomChallenge();
+                    break;
+                case 2:
+                    System.out.println("Challenge a friend");
+                    displayListPlayers();
+                    System.out.println("Enter name of player");
+                    String player = readString();
+                    if (player != null) {
+                        challengePlayer(player);
+                    } else {
+                        System.out.println(cls + ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
+                    }
+                    break;
+                case 3:
+                    break;
+            }
+        }
+    }
+
+    private static List<String> fetchCurrentGames() {
+
+        //TODO fech actual gamers
+        List<String> games = new ArrayList<String>();
+        games.add("Sergio");
+        games.add("Juan");
+        games.add("Edward");
+        return games;
+    }
+
+    private static void challengePlayer(String get) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void continueAgainstPlayer(String get) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static List<String> fetchNotifications() {
+        //TODO fech actual nots
+        List<String> games = new ArrayList<String>();
+        games.add("Sergio challenged you");
+        games.add("Juan played his turn");
+        games.add("The match against edward is ended");
+        return games;
+    }
+
+    private static void randomChallenge() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void displayListPlayers() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
