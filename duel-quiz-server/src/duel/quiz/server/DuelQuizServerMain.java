@@ -134,10 +134,11 @@ public class DuelQuizServerMain {
     }
 
     private static Boolean loginUser(String user, String pass) {
-        PlayerDAO playerDAO = new PlayerDAO();
-        Player player;
-        player = PlayerDAO.getPlayer(user, pass);
-        return player!=null;
+//        PlayerDAO playerDAO = new PlayerDAO();
+//        Player player;
+//        player = PlayerDAO.getPlayer(user, pass);
+//        return player!=null;
+        return true;
     }
 
     private static Boolean registerUser(String user, String pass) {
