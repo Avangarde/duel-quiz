@@ -27,13 +27,13 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         try {
             statement = connection.prepareStatement(
                     "SELECT * FROM Player "
-                            + "WHERE nomUtilisateur = ? AND motDePass = ?");
+                            + "WHERE username = ? AND password = ?");
             statement.setString(1, user);
             statement.setString(2, pass);
             ResultSet result = statement.executeQuery();
 
             if (result.next()) {
-                player = new Player(result.getString("nomUtilisateur"), result.getString("motDePass"));
+                player = new Player(result.getString("username"), result.getString("password"), result.getString("state"), result.getInt("score"));
             }
             result.close();
             statement.close();
@@ -47,6 +47,39 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             }
         }
         return player;
+    }
+    
+    public static boolean setPlayerStatus(String user, boolean isOnline){
+        String status;
+        if (isOnline){
+            status = "AVAILABLE";
+        }else{
+            status = "UNAVAILABLE";
+        }
+          
+        
+        Connection conn = null;
+        try {
+            conn = connect();
+            PreparedStatement stmt = conn.prepareStatement("UPDATE Player SET state = ?"
+                    + "WHERE username = ?");
+            stmt.setString(1, status);
+            stmt.setString(2, user);
+            ResultSet rset = stmt.executeQuery();
+
+            rset.close();
+            stmt.close();
+        } catch (SQLException e) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            try {
+                closeConnection(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return true;
+        
     }
 
 }

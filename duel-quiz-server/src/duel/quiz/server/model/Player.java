@@ -13,10 +13,36 @@ public class Player {
 
     private String user;
     private String pass;
+    private String state;
+    private Integer score;
 
     public Player(String user, String pass) {
         this.user = user;
         this.pass = pass;
+    }
+
+    public Player(String user, String pass, String state, Integer score) {
+        this.user = user;
+        this.pass = pass;
+        this.state = state;
+        this.score = score;
+    }
+       
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     /**
@@ -46,5 +72,5 @@ public class Player {
     public void setPass(String pass) {
         this.pass = pass;
     }
-    
+
 }
