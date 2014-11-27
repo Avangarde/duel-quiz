@@ -111,6 +111,8 @@ public class DuelQuizServerMain {
                 break;
                 
             case "CHALLENGE":
+                
+                String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
                 break;
