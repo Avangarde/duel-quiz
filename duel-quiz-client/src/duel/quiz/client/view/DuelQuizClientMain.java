@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import duel.quiz.client.view.ConsoleColors;
 
 /**
  *
@@ -18,8 +19,7 @@ import java.util.logging.Logger;
  */
 public class DuelQuizClientMain {
 
-    private static final BufferedReader reader
-            = new BufferedReader(new InputStreamReader(System.in));
+    private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 
     /**
@@ -27,12 +27,18 @@ public class DuelQuizClientMain {
      */
     public static void main(String[] args) {
         int option = 0;
+
+        //TODO Verify that there is a connection with the server first(?)
+
         while (option != 3) {
             mainMenu();
             option = readInteger();
             switch (option) {
                 case 1:
-                    signInOrSignUp(true);
+                    if (signInOrSignUp(true)) {
+                        gameRoomMenu();
+
+                    }
                     break;
                 case 2:
                     System.out.println("Sign Up");
@@ -138,5 +144,56 @@ public class DuelQuizClientMain {
         }
         Player player = new Player(user, pass);
         return player;
+    }
+
+    private static void gameRoomMenu() {
+        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room *****  *****  ****");
+        Integer option = 0;
+        while (option != 4) {
+            getNotifications();
+            System.out.println("What do you want to do?");
+            System.out.println("1. See all notifications");
+            System.out.println("2. See current games");
+            System.out.println("3. Start a new game");
+            System.out.println("4. Logout\n");
+            
+            option = readInteger();
+            
+            switch (option) {
+                case 1:
+                    System.out.println("Notifications");
+                    displayNotifications();
+                    break;
+                case 2:
+                    System.out.println("Current Games");
+                    displayCurrentGames();
+                    break;
+                case 3:
+                    System.out.println("Start a new game");
+                    startNewGameMenu();
+                    break;
+                case 4:
+                    break;
+                default:
+                    System.out.println("Invalid Option");
+                    break;
+            }
+        }
+    }
+
+    private static void getNotifications() {
+        System.out.println(ConsoleColors.ANSI_GREEN + "You have new notifications" + ConsoleColors.ANSI_RESET);
+    }
+
+    private static void displayNotifications() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void displayCurrentGames() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void startNewGameMenu() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
