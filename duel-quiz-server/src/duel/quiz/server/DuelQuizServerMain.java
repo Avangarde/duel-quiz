@@ -4,6 +4,8 @@
  */
 package duel.quiz.server;
 
+import duel.quiz.server.model.Player;
+import duel.quiz.server.model.dao.PlayerDAO;
 import java.io.*;
 import java.net.*;
 
@@ -78,7 +80,6 @@ public class DuelQuizServerMain {
     private static Boolean treatMessage(DataOutputStream out, DataInputStream in, String message) throws IOException {
 
         //Method to treat the incoming messages.
-
         Boolean output = false;
 
         switch (message) {
@@ -106,10 +107,10 @@ public class DuelQuizServerMain {
                 System.out.println("pss " + pass);
 
                 output = registerUser(user, pass);
-                
+
                 //output = loginUser(user, pass);
                 break;
-                
+
             case "CHALLENGE":
                 
                 String userChallenged = in.readUTF();
@@ -133,9 +134,10 @@ public class DuelQuizServerMain {
     }
 
     private static Boolean loginUser(String user, String pass) {
-        //TODO Create a something and act on it
-
-        return false; //To change body of generated methods, choose Tools | Templates.
+        PlayerDAO playerDAO = new PlayerDAO();
+        Player player;
+        player = PlayerDAO.getPlayer(user, pass);
+        return player!=null;
     }
 
     private static Boolean registerUser(String user, String pass) {
