@@ -23,6 +23,9 @@ public class DuelQuizClientMain {
 
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    
+    private static Player currentPlayer = null;
+    
 
     /**
      * @param args the command line arguments
@@ -119,6 +122,7 @@ public class DuelQuizClientMain {
             String msg;
             if (signIn) {
                 signed = pc.signInorSignUp(player, true);
+                DuelQuizClientMain.currentPlayer = player;
                 msg = "Login";
             } else {
                 signed = pc.signInorSignUp(player, false);
@@ -169,6 +173,8 @@ public class DuelQuizClientMain {
         System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room *****  *****  ****");
         Integer option = 0;
         while (option != 4) {
+            System.out.println(ConsoleColors.ANSI_PURPLE + "Current score: " +
+                    DuelQuizClientMain.currentPlayer.getScore() + ConsoleColors.ANSI_RESET);
             getNotifications();
             System.out.println("What do you want to do?");
             System.out.println("1. See all notifications");

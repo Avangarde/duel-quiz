@@ -11,5 +11,5 @@ package duel.quiz.client.controller;
 public abstract class AbstractController {
 
     protected static final String HOST = "localhost";
-    protected static final int PUERTO = 5000;
+    protected static final int PORT = 5000;
 }
