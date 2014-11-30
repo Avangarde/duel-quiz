@@ -296,7 +296,7 @@ public class DuelQuizClientMain {
 
     private static List<String> fetchCurrentGames() {
 
-        //TODO fech actual gamers
+        //TODO fetch actual gamers
         List<String> games = new ArrayList<String>();
         games.add("Sergio");
         games.add("Juan");
