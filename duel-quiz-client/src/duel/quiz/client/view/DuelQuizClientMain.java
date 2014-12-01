@@ -121,11 +121,11 @@ public class DuelQuizClientMain {
             PlayerController pc = new PlayerController();
             String msg;
             if (signIn) {
-                signed = pc.signInorSignUp(player, true);
+                signed = pc.signIn(player);
                 DuelQuizClientMain.currentPlayer = player;
                 msg = "Login";
             } else {
-                signed = pc.signInorSignUp(player, false);
+                signed = pc.signUp(player);
                 msg = "SignUp";
             }
             boolean valid = false;

@@ -4,12 +4,10 @@
  */
 package duel.quiz.server;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.dao.PlayerDAO;
 import java.io.*;
 import java.net.*;
-import java.sql.SQLException;
 
 /**
  *
@@ -47,16 +45,17 @@ public class DuelQuizServerMain {
 
                 System.out.println("Welcome");
 
-                //Recieving protocol message from client/first handshake
+                //Receiving protocol message from client/first handshake
                 String message = in.readUTF();
 
                 //Business logic
                 Boolean response = treatMessage(out, in, message);
 
                 //Response
-                System.out.print("Response..." + response);
+                System.out.println("Response..." + response);
 
                 //Put on out channel (to client)
+//                out.flush();
                 out.writeBoolean(response);
                 System.out.println("Sending response... ");
                 out.flush();
@@ -66,6 +65,7 @@ public class DuelQuizServerMain {
                 try {
                     socket.close();
                 } catch (IOException ex) {
+                    System.out.println("Cannot close socket");
                 }
             } catch (Exception e) {
                 System.err.println("Closing...");
@@ -73,6 +73,7 @@ public class DuelQuizServerMain {
                     try {
                         socket.close();
                     } catch (IOException ex) {
+                        System.out.println("Cannot close other socket");
                     }
                 }
             }
@@ -91,17 +92,14 @@ public class DuelQuizServerMain {
                 //System.out.print("Asking for username... ");
                 //out.flush();
                 String user = in.readUTF(); //Obtain user (from message or protocol)
-                System.out.println("user " + user);
+//                System.out.println("user " + user);
                 String pass = in.readUTF(); //Obtain pass
-                System.out.println("pss " + pass);
-
+//                System.out.println("pss " + pass);
                 Player player = loginUser(user, pass);
 
                 if (player != null) {
                     out.writeInt(player.getScore());
-
                     output = true;
-
                 } else {
                     output = false;
 
@@ -154,12 +152,12 @@ public class DuelQuizServerMain {
 
     private static Boolean registerUser(String user, String pass) {
         //Verify existence in all BDs
-        if (PlayerDAO.getPlayer(user, pass)==null){
+        if (PlayerDAO.getPlayer(user, pass) == null) {
             //Enregistrer l'informations dans la BD
-            PlayerDAO.persist(user,pass);
+            PlayerDAO.persist(user, pass);
             System.out.println("Account registered");
             return true;
-        }else{
+        } else {
             System.out.println("User already exists here");
             return false;
         }

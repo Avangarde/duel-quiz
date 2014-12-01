@@ -84,16 +84,12 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         Connection connection = connect();
         boolean ret = false;
         try {
-            System.out.println("Beginning Persist");
             PreparedStatement statement = connection.prepareStatement("INSERT INTO player VALUES (?, ?, 'AVAILABLE', '0')");
             statement.setString(1, user);
             statement.setString(2, pass);
-            System.out.println("Execution");
             statement.executeQuery();
             statement.close();
-            System.out.println("Closing");
             connection.close();
-            System.out.println("Closed");
             ret = true;
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("User already exists");
