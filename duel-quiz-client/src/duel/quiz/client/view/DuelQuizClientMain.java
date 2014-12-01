@@ -5,6 +5,7 @@
 package duel.quiz.client.view;
 
 import duel.quiz.client.controller.PlayerController;
+import duel.quiz.client.controller.QuestionController;
 import duel.quiz.client.model.Player;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -180,7 +181,8 @@ public class DuelQuizClientMain {
             System.out.println("1. See all notifications");
             System.out.println("2. See current games");
             System.out.println("3. Start a new game");
-            System.out.println("4. Logout\n");
+            System.out.println("4. Suggest question");
+            System.out.println("5. Logout\n");
             //TODO if there is time
             //System.out.println("5. Show statistics (maybe)\n");
 
@@ -200,6 +202,9 @@ public class DuelQuizClientMain {
                     startNewGameMenu();
                     break;
                 case 4:
+                    System.out.println("Suggest a Question");
+                    suggestQuestion();
+                case 5:
 
                     //TODO do formal logout with client-server communication
                     break;
@@ -327,5 +332,19 @@ public class DuelQuizClientMain {
 
     private static void displayListPlayers() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void suggestQuestion() {
+        //Select Category name //Number
+        QuestionController controller =new QuestionController();
+        List<String> categoryList = controller.fetchAllCategories();
+        
+        for (String each : categoryList){
+            System.out.println(each);
+        }
+        //Suggest Question
+        //Correct Answer
+        //Other answers
+                
     }
 }
