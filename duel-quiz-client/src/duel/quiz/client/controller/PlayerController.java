@@ -13,9 +13,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  * @author martijua
  */
 public class PlayerController extends AbstractController {
@@ -23,33 +24,52 @@ public class PlayerController extends AbstractController {
     private static final String LOGIN_SMS = "LOGIN";
     private static final String SIGNUP_SMS = "REGISTER";
 
-    public boolean signInorSignUp(Player player, boolean signIn) {
+    public boolean signIn(Player player) {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         boolean logged = false;
         try {
+            //@TODO: deal with java.net.ConnectException
             skClient = new Socket(HOST, PORT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-            //Sending signInorSignUp SMS, user and passwd
-            if (signIn) {
-                output.writeUTF(LOGIN_SMS);
-            } else {
-                output.writeUTF(SIGNUP_SMS);
-            }
+            //Sending signUp SMS, user and passwd
+            output.writeUTF(LOGIN_SMS);
+            output.writeUTF(player.getUser());
+            output.writeUTF(player.getPass());
+            output.flush();
+            player.setScore(input.readInt());
+            logged = input.readBoolean();
+            skClient.close();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+//            System.out.println("IO Exception");
+        }
+        return logged;
+    }
+
+    public boolean signUp(Player player) {
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        boolean logged = false;
+        try {
+            //@TODO: deal with java.net.ConnectException
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            output.writeUTF(SIGNUP_SMS);
+
             output.writeUTF(player.getUser());
             output.writeUTF(player.getPass());
             output.flush();
 
-            //Getting data response
-            
-            player.setScore(input.readInt());
-            
-            //Getting final status response
-
-            
             logged = input.readBoolean();
             skClient.close();
         } catch (UnknownHostException ex) {
@@ -60,9 +80,5 @@ public class PlayerController extends AbstractController {
             System.out.println("IO Exception");
         }
         return logged;
-    }
-
-    public boolean signUp(Player player) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

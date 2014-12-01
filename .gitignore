@@ -18,6 +18,7 @@ duel-quiz-server/lib/nblibraries.properties
 
 duel-quiz-client/.com.apple.timemachine.supported
 duel-quiz-client/.idea/
+duel-quiz-server/.idea/
 
 duel-quiz-client/nbproject/
 duel-quiz-server/nbproject/
@@ -26,3 +27,16 @@ duel-quiz-client/build.xml
 duel-quiz-server/build.xml
 
 duel-quiz-client/duel-quiz-client.iml
+duel-quiz-server/duel-quiz-server.iml
+
+duel-quiz-client/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar
+duel-quiz-server/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar
+
+duel-quiz-client/lib/nblibraries.properties
+duel-quiz-server/lib/nblibraries.properties
+
+duel-quiz-client/nbproject/build-impl.xml
+duel-quiz-client/nbproject/genfiles.properties
+
+duel-quiz-server/nbproject/build-impl.xml
+duel-quiz-server/nbproject/genfiles.properties
