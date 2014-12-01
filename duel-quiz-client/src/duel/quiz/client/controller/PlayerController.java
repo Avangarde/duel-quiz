@@ -24,14 +24,14 @@ public class PlayerController extends AbstractController {
     private static final String SIGNUP_SMS = "REGISTER";
 
     public boolean signInorSignUp(Player player, boolean signIn) {
-        Socket skCliente;
+        Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         boolean logged = false;
         try {
-            skCliente = new Socket(HOST, PUERTO);
-            input = new DataInputStream(new BufferedInputStream(skCliente.getInputStream()));
-            output = new DataOutputStream(new BufferedOutputStream(skCliente.getOutputStream()));
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
             //Sending signInorSignUp SMS, user and passwd
             if (signIn) {
@@ -39,13 +39,19 @@ public class PlayerController extends AbstractController {
             } else {
                 output.writeUTF(SIGNUP_SMS);
             }
-            output.writeUTF(player.getUsername());
-            output.writeUTF(player.getPasswd());
+            output.writeUTF(player.getUser());
+            output.writeUTF(player.getPass());
             output.flush();
 
-            //Getting response
+            //Getting data response
+            
+            player.setScore(input.readInt());
+            
+            //Getting final status response
+
+            
             logged = input.readBoolean();
-            skCliente.close();
+            skClient.close();
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");

@@ -1,49 +1,76 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package duel.quiz.client.model;
 
 /**
  *
- * @author martijua
+ * @author Jummartinezro
  */
 public class Player {
-    private String username;
-    private String passwd;
 
-    public Player(String username, String passwd) {
-        this.username = username;
-        this.passwd = passwd;
+    private String user;
+    private String pass;
+    private String state;
+    private Integer score;
+
+    public Player(String user, String pass) {
+        this.user = user;
+        this.pass = pass;
+    }
+
+    public Player(String user, String pass, String state, Integer score) {
+        this.user = user;
+        this.pass = pass;
+        this.state = state;
+        this.score = score;
     }
        
-    /**
-     * @return the username
-     */
-    public String getUsername() {
-        return username;
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     /**
-     * @return the passwd
+     * @return the user
      */
-    public String getPasswd() {
-        return passwd;
+    public String getUser() {
+        return user;
     }
 
     /**
-     * @param username the username to set
+     * @return the pass
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public String getPass() {
+        return pass;
     }
 
     /**
-     * @param passwd the passwd to set
+     * @param user the user to set
      */
-    public void setPasswd(String passwd) {
-        this.passwd = passwd;
+    public void setUser(String user) {
+        this.user = user;
     }
-    
-    
+
+    /**
+     * @param pass the pass to set
+     */
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
 }

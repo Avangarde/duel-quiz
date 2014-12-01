@@ -4,10 +4,12 @@
  */
 package duel.quiz.server;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.dao.PlayerDAO;
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 
 /**
  *
@@ -56,7 +58,7 @@ public class DuelQuizServerMain {
 
                 //Put on out channel (to client)
                 out.writeBoolean(response);
-                System.out.print("Sending response... ");
+                System.out.println("Sending response... ");
                 out.flush();
                 System.out.println("OK");
 
@@ -93,7 +95,17 @@ public class DuelQuizServerMain {
                 String pass = in.readUTF(); //Obtain pass
                 System.out.println("pss " + pass);
 
-                output = loginUser(user, pass);
+                Player player = loginUser(user, pass);
+
+                if (player != null) {
+                    out.writeInt(player.getScore());
+
+                    output = true;
+
+                } else {
+                    output = false;
+
+                }
 
                 //TODO Construct a model for the user
                 //TODO Set Variables in DAO
@@ -112,7 +124,7 @@ public class DuelQuizServerMain {
                 break;
 
             case "CHALLENGE":
-                
+
                 String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
@@ -133,18 +145,23 @@ public class DuelQuizServerMain {
 
     }
 
-    private static Boolean loginUser(String user, String pass) {
-//        PlayerDAO playerDAO = new PlayerDAO();
-//        Player player;
-//        player = PlayerDAO.getPlayer(user, pass);
-//        return player!=null;
-        return true;
+    private static Player loginUser(String user, String pass) {
+        Player player;
+        player = PlayerDAO.getPlayer(user, pass);
+        PlayerDAO.setPlayerStatus(user, true);
+        return player;
     }
 
     private static Boolean registerUser(String user, String pass) {
-        //TODO Create a something and act on it
         //Verify existence in all BDs
-        //Enregistrer l'informations dans la BD
-        return true;
+        if (PlayerDAO.getPlayer(user, pass)==null){
+            //Enregistrer l'informations dans la BD
+            PlayerDAO.persist(user,pass);
+            System.out.println("Account registered");
+            return true;
+        }else{
+            System.out.println("User already exists here");
+            return false;
+        }
     }
 }
