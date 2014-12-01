@@ -134,6 +134,9 @@ public class DuelQuizServerMain {
                 //Transmits all categories
                 QuestionController.transmitCategories(true, out, in);
                 break;
+            case "NEWQUESTION":
+                QuestionController.createNewQuestion(out, in);
+                break;
             default:
                 //the message is not compliant with any other message
 

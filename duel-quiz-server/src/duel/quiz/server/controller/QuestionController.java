@@ -13,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,5 +72,27 @@ public class QuestionController {
         int randomNum = rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
+    }
+
+    public static boolean createNewQuestion(DataOutputStream out, DataInputStream in) {
+        List<String> wrongAnswers = new ArrayList<>();
+
+        try {
+            String categorySelected = in.readUTF();
+            String question = in.readUTF();
+            String rightAnswer = in.readUTF();
+            wrongAnswers.add(in.readUTF());
+            wrongAnswers.add(in.readUTF());
+            wrongAnswers.add(in.readUTF());
+
+            //TODO Persist
+            
+            
+            out.writeUTF("Persisted :)");
+        } catch (IOException ex) {
+            Logger.getLogger(QuestionController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+        }
+        return true;
     }
 }
