@@ -30,7 +30,7 @@ public class QuestionController extends AbstractController {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
-        List<String> listCategories = new ArrayList<>();
+        List<String> listCategories = new ArrayList<String>();
         try {
             skClient = new Socket(HOST, PORT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));

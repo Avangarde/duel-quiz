@@ -328,6 +328,10 @@ public class DuelQuizClientMain {
 
     private static void randomChallenge() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //@TODO request the user for a random Player
+        //@TODO recover the list and send to the server the element selected
+        //@TODO set in the local BD the status of the match
+        //@TODO answer the questions
     }
 
     private static void displayListPlayers() {
@@ -341,7 +345,7 @@ public class DuelQuizClientMain {
         String categorySelected = "";
         String question = "";
         String rightAnswer = "";
-        List<String> wrongAnswers = new ArrayList<>();
+        ArrayList<String> wrongAnswers = new ArrayList<String>();
         QuestionController controller = new QuestionController();
         List<String> categoryList = controller.fetchAllCategories();
 

@@ -4,8 +4,6 @@
  */
 package duel.quiz.server;
 
-import duel.quiz.server.model.Player;
-import duel.quiz.server.model.dao.PlayerDAO;
 import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.LoginController;
 import duel.quiz.server.model.Player;
@@ -20,8 +18,9 @@ import java.util.logging.Logger;
  */
 public class DuelQuizServerMain implements Runnable {
 
-    static Socket socket = null;
-    static ServerSocket serverSocket;
+    private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    private static Socket socket = null;
+    private static ServerSocket serverSocket;
 
     /**
      * @param args the command line arguments
@@ -37,13 +36,14 @@ public class DuelQuizServerMain implements Runnable {
             System.exit(0);
 //            Logger.getLogger(DuelQuizServerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //@TODO Update the availabilty list (Load at the beginning)
-        Thread thread = new Thread(new LoginController());
-            thread.start();
+        //@TODO Update the availabilty list (Load at the beginning) (TO DISCUSS !!)
+        LoginController lc = new LoginController();
+        Thread thread = new Thread(lc);
+        thread.start();
         //Listening while running
         while (true) {
             try {
-                System.out.println("Ready to receive connections...");
+                System.out.println(cls + "Ready to receive connections...");
                 //Accept a connection
                 socket = receiveConnection(socket, serverSocket);
                 //Closing
@@ -70,17 +70,13 @@ public class DuelQuizServerMain implements Runnable {
         //Creates two streams of data
         DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        System.out.println("Welcome");
         //Receiving protocol message from client/first handshake
         String message = in.readUTF();
         //Business logic
         Boolean response = treatMessage(out, in, message);
         //Response
-        System.out.println("Response..." + response);
         out.writeBoolean(response);
-        System.out.println("Sending response... ");
         out.flush();
-        System.out.println("OK");
         return socket;
     }
 
@@ -95,13 +91,12 @@ public class DuelQuizServerMain implements Runnable {
                 String user = in.readUTF(); //Obtain user (from message or protocol)
                 String pass = in.readUTF(); //Obtain pass
                 Player player = LoginController.loginUser(user, pass);
-                //@TODO GRAVE Fix login when incorrect pass
                 if (player != null) {
                     out.writeInt(player.getScore());
                     output = true;
                 } else {
+                    out.writeInt(-1);
                     output = false;
-
                 }
 
                 //TODO Construct a model for the user
@@ -120,7 +115,7 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case "RANDOMPLAY":
                 break;
-                
+
             case "REQUESTCATS":
                 //Transmits all categories
                 QuestionController.transmitCategories(true, out, in);

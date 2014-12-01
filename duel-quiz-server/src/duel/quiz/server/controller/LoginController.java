@@ -25,6 +25,12 @@ public class LoginController implements Runnable {
     private static final int REMOVE_PLAYERS_MINUTES = 5;
     private static final HashMap<String, Long> availablePlayers = new HashMap<>();
 
+    /**
+     * Logs a player and put his name in the availability list
+     * @param user
+     * @param pass
+     * @return
+     */
     public static Player loginUser(String user, String pass) {
         Player player;
         player = PlayerDAO.getPlayer(user, pass);
@@ -35,6 +41,13 @@ public class LoginController implements Runnable {
         return player;
     }
 
+    /**
+     * Register a user
+     *
+     * @param user
+     * @param pass
+     * @return
+     */
     public static Boolean registerUser(String user, String pass) {
         //Verify existence in all BDs
         if (PlayerDAO.getPlayer(user, pass) == null) {
@@ -52,12 +65,12 @@ public class LoginController implements Runnable {
      * Reads the list of available players and if he is not connected then
      * change his status
      */
-    public static void updateAvailabilityList() {
+    public static void removePlayersUnavailables() {
         long actualTime = System.currentTimeMillis();
         String player;
         for (Entry<String, Long> av : availablePlayers.entrySet()) {
-            if ((actualTime - av.getValue()) / 1000 > 
-                    TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
+            if ((actualTime - av.getValue()) / 1000
+                    > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
                 player = av.getKey();
                 PlayerDAO.setPlayerStatus(player, false);
                 availablePlayers.remove(player);
@@ -70,7 +83,7 @@ public class LoginController implements Runnable {
     @Override
     public void run() {
         while (true) {
-            updateAvailabilityList();
+            removePlayersUnavailables();
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {

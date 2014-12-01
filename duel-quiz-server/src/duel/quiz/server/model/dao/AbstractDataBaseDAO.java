@@ -20,17 +20,11 @@ public abstract class AbstractDataBaseDAO {
 
     public static Connection connect() {
         try {
-            System.out.print("Loading Oracle driver... ");
-            //DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-            System.out.println("loaded");
-            // Etablissement de la connection
-            System.out.print("Connecting to the database... ");
             Connection conn = DriverManager.getConnection(CONN_URL, DBUSER, PASSWD);
-            System.out.println("connected");
             return conn;
         } catch (SQLException ex) {
-            System.err.println("failed");
-            ex.printStackTrace(System.err);
+            System.err.println("Failed to connect to the DB");
+//            ex.printStackTrace(System.err);
             return null;
         }
     }
@@ -38,8 +32,8 @@ public abstract class AbstractDataBaseDAO {
     /**
      * fermeture d'une connexion
      *
-     * @param c la connexion à fermer
-     * @throws DAOException si problème lors de la fermeture de la connexion
+     * @param c la connexio connexion
+     * @throws java.sql.SQLException
      */
     protected static void closeConnection(Connection c) throws SQLException {
         if (c != null) {
