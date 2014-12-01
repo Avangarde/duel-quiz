@@ -6,6 +6,7 @@ package duel.quiz.server;
 
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.dao.PlayerDAO;
+import duel.quiz.server.controller.QuestionController;
 import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
@@ -127,6 +128,11 @@ public class DuelQuizServerMain {
                 String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
+                break;
+                
+            case "REQUESTCATS":
+                //Transmits all categories
+                QuestionController.transmitCategories(true, out, in);
                 break;
             default:
                 //the message is not compliant with any other message
