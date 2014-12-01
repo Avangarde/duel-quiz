@@ -4,6 +4,9 @@
  */
 package duel.quiz.server;
 
+import duel.quiz.server.model.Player;
+import duel.quiz.server.model.dao.PlayerDAO;
+import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.LoginController;
 import duel.quiz.server.model.Player;
 import java.io.*;
@@ -115,6 +118,14 @@ public class DuelQuizServerMain implements Runnable {
                 String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
+                break;
+                
+            case "REQUESTCATS":
+                //Transmits all categories
+                QuestionController.transmitCategories(true, out, in);
+                break;
+            case "NEWQUESTION":
+                QuestionController.createNewQuestion(out, in);
                 break;
             default:
                 //the message is not compliant with any other message
