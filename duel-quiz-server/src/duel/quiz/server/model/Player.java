@@ -27,7 +27,6 @@ public class Player {
         this.state = state;
         this.score = score;
     }
-       
 
     public String getState() {
         return state;
