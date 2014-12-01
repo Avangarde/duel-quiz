@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import duel.quiz.client.view.ConsoleColors;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,7 @@ public class DuelQuizClientMain {
 
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    
     private static Player currentPlayer = null;
-    
 
     /**
      * @param args the command line arguments
@@ -173,9 +172,9 @@ public class DuelQuizClientMain {
     private static void gameRoomMenu() {
         System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room *****  *****  ****");
         Integer option = 0;
-        while (option != 4) {
-            System.out.println(ConsoleColors.ANSI_PURPLE + "Current score: " +
-                    DuelQuizClientMain.currentPlayer.getScore() + ConsoleColors.ANSI_RESET);
+        while (option != 5) {
+            System.out.println(ConsoleColors.ANSI_PURPLE + "Current score: "
+                    + DuelQuizClientMain.currentPlayer.getScore() + ConsoleColors.ANSI_RESET);
             getNotifications();
             System.out.println("What do you want to do?");
             System.out.println("1. See all notifications");
@@ -204,6 +203,7 @@ public class DuelQuizClientMain {
                 case 4:
                     System.out.println("Suggest a Question");
                     suggestQuestion();
+                    break;
                 case 5:
 
                     //TODO do formal logout with client-server communication
@@ -336,15 +336,55 @@ public class DuelQuizClientMain {
 
     private static void suggestQuestion() {
         //Select Category name //Number
-        QuestionController controller =new QuestionController();
+        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/SuggestQuestion *****  *****  ****");
+        Integer option = 0;
+        String categorySelected = "";
+        String question = "";
+        String rightAnswer = "";
+        List<String> wrongAnswers = new ArrayList<>();
+        QuestionController controller = new QuestionController();
         List<String> categoryList = controller.fetchAllCategories();
-        
-        for (String each : categoryList){
-            System.out.println(each);
+
+        int exit = categoryList.size() + 1;
+        while (option != exit) {
+
+            System.out.println("Choose a category:\n");
+            int currentIndex = 1;
+            for (String each : categoryList) {
+                System.out.println(currentIndex + ". " + each);
+                currentIndex++;
+            }
+
+            System.out.println(exit + ". Go Back\n");
+
+            option = readInteger();
+
+            if (option >= 0 && option < exit) {
+                categorySelected = categoryList.get(option);
+                System.out.println("Enter question:\n");
+                question = readString();
+                System.out.println("Enter right answer:\n");
+                rightAnswer = readString();
+                System.out.println("Enter wrong answers:\n");
+                System.out.println("1:\n");
+                wrongAnswers.add(readString());
+                System.out.println("2:\n");
+                wrongAnswers.add(readString());
+                System.out.println("3:\n");
+                wrongAnswers.add(readString());
+                
+                controller.createNewQuestion(categorySelected, question, rightAnswer, wrongAnswers);
+
+
+            } else if (option == exit) {
+                break;
+            } else {
+                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
+            }
         }
         //Suggest Question
         //Correct Answer
         //Other answers
-                
+
     }
 }
