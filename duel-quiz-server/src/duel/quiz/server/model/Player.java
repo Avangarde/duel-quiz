@@ -5,6 +5,8 @@
  */
 package duel.quiz.server.model;
 
+import java.util.List;
+
 /**
  *
  * @author Jummartinezro
@@ -13,6 +15,9 @@ public class Player {
 
     private String user;
     private String pass;
+    //Foreign
+    private List<Answer> listAnswers;
+    private List<Duel> listDuels;
 
     public Player(String user, String pass) {
         this.user = user;
@@ -46,5 +51,20 @@ public class Player {
     public void setPass(String pass) {
         this.pass = pass;
     }
-    
+
+    public List<Answer> getListAnswers() {
+        return listAnswers;
+    }
+
+    public void setListAnswers(List<Answer> listAnswers) {
+        this.listAnswers = listAnswers;
+    }
+
+    public List<Duel> getListDuels() {
+        return listDuels;
+    }
+
+    public void setListDuels(List<Duel> listDuels) {
+        this.listDuels = listDuels;
+    }
 }
