@@ -4,7 +4,6 @@
  */
 package duel.quiz.client.controller;
 
-import static duel.quiz.client.controller.AbstractController.HOST;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

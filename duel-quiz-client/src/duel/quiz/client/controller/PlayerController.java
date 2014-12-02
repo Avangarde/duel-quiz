@@ -4,7 +4,6 @@
  */
 package duel.quiz.client.controller;
 
-import static duel.quiz.client.controller.AbstractController.HOST;
 import duel.quiz.client.model.Player;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -12,8 +11,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +26,15 @@ public class PlayerController extends AbstractController {
     private static final String SIGNUP_SMS = "REGISTER";
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
+    private final int TIME_OUT = 5000;
 
+    public PlayerController(String host) {
+        this.HOST = host;
+    }
 
     /**
      * Sign-in a Player
+     *
      * @param player
      * @return
      */
@@ -42,6 +46,7 @@ public class PlayerController extends AbstractController {
         try {
             //@TODO: deal with java.net.ConnectException
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -56,6 +61,9 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException ex) {
+            //@TODO Server fault 
+            System.err.println("Server down :(");
         } catch (IOException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
 //            System.out.println("IO Exception");
@@ -65,6 +73,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign up a player
+     *
      * @param player
      * @return
      */
@@ -99,9 +108,10 @@ public class PlayerController extends AbstractController {
 
     /**
      * Must get a list with the player list
+     *
      * @return
      */
-    public List<String> fetchPlayerList(){
+    public List<String> fetchPlayerList() {
 //        Socket skClient;
 //        DataInputStream input;
 //        DataOutputStream output;
@@ -153,7 +163,6 @@ public class PlayerController extends AbstractController {
             output.flush();
 
             //@TODO Receive the answers and deal with them
-
             skClient.close();
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
