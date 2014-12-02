@@ -6,15 +6,14 @@ package duel.quiz.client.view;
 
 import duel.quiz.client.controller.PlayerController;
 import duel.quiz.client.controller.QuestionController;
+import duel.quiz.client.controller.TicketController;
+import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Player;
+import duel.quiz.client.model.Ticket;
 
 import java.io.*;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import duel.quiz.client.view.ConsoleColors;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,8 @@ public class DuelQuizClientMain {
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     private static Player currentPlayer = null;
 
+    private static Ticket ticket = null;
+
     /**
      * @param args the command line arguments
      */
@@ -35,7 +36,6 @@ public class DuelQuizClientMain {
         int option = 0;
 
         //TODO Verify that there is a connection with the server first(?)
-
         while (option != 3) {
             mainMenu();
             option = readInteger();
@@ -116,20 +116,29 @@ public class DuelQuizClientMain {
     private static boolean signInOrSignUp(boolean signIn) {
         boolean signed = false;
         boolean failed = false;
+        boolean valid = false;
+        String msg = "Connect";
         while (!signed && !failed) {
-
-            Player player = getPlayer();
-            PlayerController pc = new PlayerController();
-            String msg;
-            if (signIn) {
-                signed = pc.signIn(player);
-                DuelQuizClientMain.currentPlayer = player;
-                msg = "Login";
-            } else {
-                signed = pc.signUp(player);
-                msg = "SignUp";
+            try {
+                if (ticket == null) {
+                    ticket = TicketController.getNewTicket();
+                } else {
+                    ticket = TicketController.validateTicket(ticket);
+                }
+                Player player = getPlayer();
+                PlayerController pc = new PlayerController(ticket.getServerAddress());
+                if (signIn) {
+                    signed = pc.signIn(player);
+                    DuelQuizClientMain.currentPlayer = player;
+                    msg = "Login";
+                } else {
+                    signed = pc.signUp(player);
+                    msg = "SignUp";
+                }
+            } catch (ServerDownException ex) {
+                System.err.println("Server down :(");
             }
-            boolean valid = false;
+
             while (!signed && !failed && !valid) {
                 System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
                 System.out.println("\t1. Yes");
@@ -225,8 +234,6 @@ public class DuelQuizClientMain {
         Integer option = 0;
         List<String> nots = fetchNotifications();
 
-
-
         int currentIndex = 1;
         for (String each : nots) {
             System.out.println(each);
@@ -249,7 +256,6 @@ public class DuelQuizClientMain {
                 System.out.println(currentIndex + ", Play against " + each);
                 currentIndex++;
             }
-
 
             System.out.println(exit + ". Go Back\n");
 
@@ -328,8 +334,18 @@ public class DuelQuizClientMain {
     }
 
     private static void randomChallenge() {
+        try {
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            return;
+        }
         //@TODO request the user for a random Player and get the questions
-        PlayerController playerController =new PlayerController();
+        PlayerController playerController = new PlayerController(ticket.getServerAddress());
         playerController.requestRandomChallenge();
         //@TODO answer the questions and send them to the Server
         //@TODO Server must request to the clients until someone accepts
@@ -380,9 +396,8 @@ public class DuelQuizClientMain {
                 wrongAnswers.add(readString());
                 System.out.println("3:\n");
                 wrongAnswers.add(readString());
-                
-                controller.createNewQuestion(categorySelected, question, rightAnswer, wrongAnswers);
 
+                controller.createNewQuestion(categorySelected, question, rightAnswer, wrongAnswers);
 
             } else if (option == exit) {
                 break;
@@ -394,5 +409,13 @@ public class DuelQuizClientMain {
         //Correct Answer
         //Other answers
 
+    }
+
+    public static Ticket getTicket() {
+        return ticket;
+    }
+
+    public static void setTicket(Ticket ticket) {
+        DuelQuizClientMain.ticket = ticket;
     }
 }

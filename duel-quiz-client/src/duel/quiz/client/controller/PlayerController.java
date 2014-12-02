@@ -11,6 +11,7 @@ import duel.quiz.client.model.Question;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,14 @@ public class PlayerController extends AbstractController {
     private static final String SIGNUP_SMS = "REGISTER";
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
+    private final int TIME_OUT = 5000;
 
+    public PlayerController(String host) {
+        this.HOST = host;
+    }
 
     /**
      * Sign-in a Player
-     *
      * @param player
      * @return
      */
@@ -42,6 +46,7 @@ public class PlayerController extends AbstractController {
         try {
             //@TODO: deal with java.net.ConnectException
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -56,6 +61,9 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException ex) {
+            //@TODO Server fault 
+            System.err.println("Server down :(");
         } catch (IOException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
 //            System.out.println("IO Exception");
@@ -65,7 +73,6 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign up a player
-     *
      * @param player
      * @return
      */
@@ -100,7 +107,6 @@ public class PlayerController extends AbstractController {
 
     /**
      * Must get a list with the player list
-     *
      * @return
      */
     public List<String> fetchPlayerList() {
@@ -140,6 +146,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Request the server for a New Player and get the questions
+     *
      */
     public void requestRandomChallenge() {
         Socket skClient;
@@ -166,6 +173,7 @@ public class PlayerController extends AbstractController {
             readQuestions(input, category2, questionsCat2);
             readQuestions(input, category3, questionsCat3);
 
+            //@TODO Receive the answers and deal with them
             skClient.close();
 
             //@TODO Answer the questions and send the answers to the server
