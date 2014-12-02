@@ -4,6 +4,8 @@
  */
 package duel.quiz.server.model;
 
+import java.util.List;
+
 /**
  *
  * @author corteshs
@@ -14,6 +16,7 @@ public class Question {
     private String question;
     //Foreign
     private Category categoryName;
+    List<Answer> answers;
 
     public Question(long questionID, String question, Category categoryName) {
         this.questionID = questionID;
@@ -44,7 +47,12 @@ public class Question {
     public void setCategoryName(Category categoryName) {
         this.categoryName = categoryName;
     }
-    
-    
-    
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
 }

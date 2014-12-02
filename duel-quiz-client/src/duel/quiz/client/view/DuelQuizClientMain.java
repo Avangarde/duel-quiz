@@ -7,9 +7,10 @@ package duel.quiz.client.view;
 import duel.quiz.client.controller.PlayerController;
 import duel.quiz.client.controller.QuestionController;
 import duel.quiz.client.model.Player;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import duel.quiz.client.view.ConsoleColors;
@@ -327,11 +328,14 @@ public class DuelQuizClientMain {
     }
 
     private static void randomChallenge() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        //@TODO request the user for a random Player
-        //@TODO recover the list and send to the server the element selected
-        //@TODO set in the local BD the status of the match
-        //@TODO answer the questions
+        //@TODO request the user for a random Player and get the questions
+        PlayerController playerController =new PlayerController();
+        playerController.requestRandomChallenge();
+        //@TODO answer the questions and send them to the Server
+        //@TODO Server must request to the clients until someone accepts
+        //@TODO set in the local BD the status of the match (random Player - En attente)
+        //@TODO when in the server side someone accepts, update the local BD with the name and the score
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static void displayListPlayers() {

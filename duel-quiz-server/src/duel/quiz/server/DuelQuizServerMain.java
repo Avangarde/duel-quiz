@@ -5,7 +5,7 @@
 package duel.quiz.server;
 
 import duel.quiz.server.controller.QuestionController;
-import duel.quiz.server.controller.LoginController;
+import duel.quiz.server.controller.PlayerController;
 import duel.quiz.server.model.Player;
 import java.io.*;
 import java.net.*;
@@ -37,7 +37,7 @@ public class DuelQuizServerMain implements Runnable {
 //            Logger.getLogger(DuelQuizServerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
         //@TODO Update the availabilty list (Load at the beginning) (TO DISCUSS !!)
-        LoginController lc = new LoginController();
+        PlayerController lc = new PlayerController();
         Thread thread = new Thread(lc);
         thread.start();
         //Listening while running
@@ -90,7 +90,7 @@ public class DuelQuizServerMain implements Runnable {
 
                 String user = in.readUTF(); //Obtain user (from message or protocol)
                 String pass = in.readUTF(); //Obtain pass
-                Player player = LoginController.loginUser(user, pass);
+                Player player = PlayerController.loginPlayer(user, pass);
                 if (player != null) {
                     out.writeInt(player.getScore());
                     output = true;
@@ -107,15 +107,15 @@ public class DuelQuizServerMain implements Runnable {
 
                 user = in.readUTF(); //Obtain user (from message or protocol)
                 pass = in.readUTF(); //Obtain pass
-                output = LoginController.registerUser(user, pass);
+                output = PlayerController.registerPlayer(user, pass);
                 break;
 
             case "CHALLENGE":
                 String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
+                QuestionController.sendNewQuestions(out,in);
                 break;
-
             case "REQUESTCATS":
                 //Transmits all categories
                 QuestionController.transmitCategories(true, out, in);

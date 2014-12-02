@@ -7,6 +7,8 @@ package duel.quiz.server.controller;
 
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.dao.PlayerDAO;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author Jummartinezro
  */
-public class LoginController implements Runnable {
+public class PlayerController implements Runnable {
 
     /**
      * Number of minutes to wait to remove a non-available user from the list
@@ -31,7 +33,7 @@ public class LoginController implements Runnable {
      * @param pass
      * @return
      */
-    public static Player loginUser(String user, String pass) {
+    public static Player loginPlayer(String user, String pass) {
         Player player;
         player = PlayerDAO.getPlayer(user, pass);
         PlayerDAO.setPlayerStatus(user, true);
@@ -42,13 +44,13 @@ public class LoginController implements Runnable {
     }
 
     /**
-     * Register a user
+     * Register a player
      *
      * @param user
      * @param pass
      * @return
      */
-    public static Boolean registerUser(String user, String pass) {
+    public static Boolean registerPlayer(String user, String pass) {
         //Verify existence in all BDs
         if (PlayerDAO.getPlayer(user, pass) == null) {
             //Enregistrer l'informations dans la BD
@@ -79,7 +81,7 @@ public class LoginController implements Runnable {
             }
         }
     }
-
+    
     @Override
     public void run() {
         while (true) {
@@ -87,7 +89,7 @@ public class LoginController implements Runnable {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

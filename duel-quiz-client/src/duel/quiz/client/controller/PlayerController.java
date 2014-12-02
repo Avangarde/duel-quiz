@@ -13,6 +13,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +25,15 @@ public class PlayerController extends AbstractController {
 
     private static final String LOGIN_SMS = "LOGIN";
     private static final String SIGNUP_SMS = "REGISTER";
+    private static final String NO_MORE_PLAYERS = "ENDOFDATA";
+    private static final String RANDOMPLAY = "RANDOMPLAY";
 
+
+    /**
+     * Sign-in a Player
+     * @param player
+     * @return
+     */
     public boolean signIn(Player player) {
         Socket skClient;
         DataInputStream input;
@@ -53,6 +63,11 @@ public class PlayerController extends AbstractController {
         return logged;
     }
 
+    /**
+     * Sign up a player
+     * @param player
+     * @return
+     */
     public boolean signUp(Player player) {
         Socket skClient;
         DataInputStream input;
@@ -80,5 +95,72 @@ public class PlayerController extends AbstractController {
             System.out.println("IO Exception");
         }
         return logged;
+    }
+
+    /**
+     * Must get a list with the player list
+     * @return
+     */
+    public List<String> fetchPlayerList(){
+//        Socket skClient;
+//        DataInputStream input;
+//        DataOutputStream output;
+//        List<String> listPlayers = new ArrayList<String>();
+//        try {
+//            skClient = new Socket(HOST, PORT);
+//            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+//            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+//
+//
+//            //Sending request for categories
+//            output.writeUTF(RANDOMPLAY);
+//            output.flush();
+//
+//            String dataSent = input.readUTF();
+//
+//
+//            while (dataSent == null ? NO_MORE_PLAYERS != null : !dataSent.equals(NO_MORE_PLAYERS)) {
+//                listPlayers.add(dataSent);
+//                dataSent = input.readUTF();
+//            }
+//            skClient.close();
+//        } catch (UnknownHostException ex) {
+////            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+//            System.out.println("Unknown Host");
+//        } catch (IOException ex) {
+////            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+//            System.out.println("IO Exception");
+//        }
+//        //Empty if something went wrong
+//        return listPlayers;
+        return null;
+    }
+
+    /**
+     * Request the server for a New Player and get the questions
+     *
+     */
+    public void requestRandomChallenge() {
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        try {
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            output.writeUTF(RANDOMPLAY);
+            output.flush();
+
+            //@TODO Receive the answers and deal with them
+
+            skClient.close();
+        } catch (UnknownHostException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (IOException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IO Exception");
+        }
     }
 }
