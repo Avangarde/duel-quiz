@@ -57,6 +57,8 @@ public class LoadBalancerThread extends Thread {
                     } catch (IOException ex) {
                         System.out.println("Cannot close socket");
                     }
+                } catch (SocketTimeoutException ex) {
+                    //@TODO Server fault 
                 } catch (Exception e) {
                     System.err.println("Closing...");
                     if (socket != null) {
@@ -68,13 +70,13 @@ public class LoadBalancerThread extends Thread {
                     }
                 }
             }
-        } else {            
-            try {                
+        } else {
+            try {
                 socket = new Socket(server.getLoadBalancerAddress(), port);
                 socket.setSoTimeout(TIME_OUT);
                 DataInputStream input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                
+
                 //Sending Register Message
                 output.writeUTF(REGISTER);
                 output.writeUTF(server.getAddress());
@@ -82,13 +84,13 @@ public class LoadBalancerThread extends Thread {
                 output.writeUTF(server.getLastConnexion());
                 System.out.println("Sending Register Message-> address: " + server.getAddress() + " lastConnexion: " + server.getLastConnexion());
                 output.flush();
-                
+
                 boolean updateBD = input.readBoolean();
                 if (updateBD) {
                     //@TODO Read list of instructions to update DB
                     //and update DB ?
                     System.out.println("Database Update needed...");
-                } 
+                }
                 //Send new date of Conexion and state
                 server.setStatus(Server.DISPONIBLE);
                 server.setLastConnexion(getCurrentDate());
@@ -96,18 +98,19 @@ public class LoadBalancerThread extends Thread {
                 output.writeUTF(server.getStatus());
                 System.out.println("Sending new date of connexion: " + server.getLastConnexion());
                 output.flush();
-                
+
                 socket.close();
             } catch (SocketTimeoutException ex) {
                 //@TODO Load Balancer fault ?
             } catch (IOException ex) {
                 Logger.getLogger(LoadBalancerThread.class.getName()).log(Level.SEVERE, null, ex);
-            }  
+            }
         }
     }
 
     private Socket receiveConnection(Socket socket, ServerSocket serverSocket) throws IOException {
         socket = serverSocket.accept();
+        socket.setSoTimeout(TIME_OUT);
         //Creates two streams of data
         DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -122,36 +125,33 @@ public class LoadBalancerThread extends Thread {
     private void treatMessage(DataOutputStream out, DataInputStream in, String message) throws IOException {
 
         //Method to treat the incoming messages.
-
         switch (message) {
             case REGISTER:
                 String address = in.readUTF();
                 String lastConnexion = in.readUTF();
                 Server newServer = new Server(address);
                 newServer.setLastConnexion(lastConnexion);
-                
+
                 if (server.getServers().contains(newServer)) {
-                    server.getServers().remove(newServer);                    
-                }                
+                    server.getServers().remove(newServer);
+                }
                 System.out.println("Registering new server: " + newServer.getAddress());
                 server.getServers().add(newServer);
-                
-                boolean update = updateNeeded(newServer);                
+
+                boolean update = updateNeeded(newServer);
                 out.writeBoolean(update);
                 if (update) {
                     //@TODO Send list of instructions to update DB                    
                 }
                 System.out.println("Sending response... update-> " + update);
                 out.flush();
-                String date =  in.readUTF();
+                String date = in.readUTF();
                 String status = in.readUTF();
                 System.out.println("Updating server info -> status: " + status + " last Connexion: " + date);
                 newServer.setLastConnexion(date);
                 newServer.setStatus(status);
-                
-                
+
                 //@TODO send info to others servers ? 
-                
                 break;
 
             default:
@@ -163,7 +163,7 @@ public class LoadBalancerThread extends Thread {
     private boolean updateNeeded(Server newServer) {
         return server.getLastConnexionDate().before(newServer.getLastConnexionDate());
     }
-    
+
     private String getCurrentDate() {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
         Date date = new GregorianCalendar().getTime();

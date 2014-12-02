@@ -1,5 +1,6 @@
 package util;
 
+import duel.quiz.server.FaultDetectorThread;
 import duel.quiz.server.LoadBalancerThread;
 import duel.quiz.server.Server;
 import java.io.IOException;
@@ -7,7 +8,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 /**
@@ -53,7 +53,11 @@ public class LoadBalancerFinder extends Thread {
                 socket.close();
                 
                 //@TODO Update Database (If needed)
+                //Register server in load Balancer
                 new LoadBalancerThread(sourceServer).start();
+                
+                //Thread to response to fault detector
+                new FaultDetectorThread(sourceServer).start();
                 
             } catch (SocketTimeoutException ex) {
                 //If no response, the source server is the load balancer
@@ -61,10 +65,13 @@ public class LoadBalancerFinder extends Thread {
                 sourceServer.setLoadBalancer(Boolean.TRUE);
                 //The server list is initialized and the server is added
                 sourceServer.setServers(new TreeSet<Server>());
-                sourceServer.getServers().add(sourceServer);
+//                sourceServer.getServers().add(sourceServer);
                 
+                //Start Load Balancer
                 new LoadBalancerThread(sourceServer).start();
-                //@TODO Start Fault detector
+
+                //Start Fault Detector
+                new FaultDetectorThread(sourceServer).start();
                 
                 //Broadcast load balancer address
                 buf = new byte[256];                                
