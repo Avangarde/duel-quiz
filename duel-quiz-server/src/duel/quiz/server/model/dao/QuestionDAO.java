@@ -5,6 +5,7 @@
 package duel.quiz.server.model.dao;
 
 import duel.quiz.server.model.Category;
+import duel.quiz.server.model.Question;
 import static duel.quiz.server.model.dao.AbstractDataBaseDAO.closeConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,6 +47,10 @@ public class QuestionDAO extends AbstractDataBaseDAO{
             }
         }
         return listCategories;
+    }
+
+    public static List<Question> getRandomQuestionsByCat(String nameCat1) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
