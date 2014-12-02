@@ -1,5 +1,6 @@
 *.properties
 *.class
+*.log
 *.xml
 
 duel-quiz-server/lib/CopyLibs/

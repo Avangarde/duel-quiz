@@ -7,6 +7,8 @@ package duel.quiz.server.controller;
 
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.dao.PlayerDAO;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author Jummartinezro
  */
-public class LoginController implements Runnable {
+public class PlayerController implements Runnable {
 
     /**
      * Number of minutes to wait to remove a non-available user from the list
@@ -25,7 +27,13 @@ public class LoginController implements Runnable {
     private static final int REMOVE_PLAYERS_MINUTES = 5;
     private static final HashMap<String, Long> availablePlayers = new HashMap<>();
 
-    public static Player loginUser(String user, String pass) {
+    /**
+     * Logs a player and put his name in the availability list
+     * @param user
+     * @param pass
+     * @return
+     */
+    public static Player loginPlayer(String user, String pass) {
         Player player;
         player = PlayerDAO.getPlayer(user, pass);
         PlayerDAO.setPlayerStatus(user, true);
@@ -35,7 +43,14 @@ public class LoginController implements Runnable {
         return player;
     }
 
-    public static Boolean registerUser(String user, String pass) {
+    /**
+     * Register a player
+     *
+     * @param user
+     * @param pass
+     * @return
+     */
+    public static Boolean registerPlayer(String user, String pass) {
         //Verify existence in all BDs
         if (PlayerDAO.getPlayer(user, pass) == null) {
             //Enregistrer l'informations dans la BD
@@ -52,12 +67,12 @@ public class LoginController implements Runnable {
      * Reads the list of available players and if he is not connected then
      * change his status
      */
-    public static void updateAvailabilityList() {
+    public static void removePlayersUnavailables() {
         long actualTime = System.currentTimeMillis();
         String player;
         for (Entry<String, Long> av : availablePlayers.entrySet()) {
-            if ((actualTime - av.getValue()) / 1000 > 
-                    TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
+            if ((actualTime - av.getValue()) / 1000
+                    > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
                 player = av.getKey();
                 PlayerDAO.setPlayerStatus(player, false);
                 availablePlayers.remove(player);
@@ -66,15 +81,15 @@ public class LoginController implements Runnable {
             }
         }
     }
-
+    
     @Override
     public void run() {
         while (true) {
-            updateAvailabilityList();
+            removePlayersUnavailables();
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

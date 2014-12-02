@@ -5,6 +5,7 @@
 package duel.quiz.client.controller;
 
 import static duel.quiz.client.controller.AbstractController.HOST;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author corteshs
  */
 public class QuestionController extends AbstractController {
@@ -30,13 +30,13 @@ public class QuestionController extends AbstractController {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
-        List<String> listCategories = new ArrayList<>();
+        List<String> listCategories = new ArrayList<String>();
         try {
             skClient = new Socket(HOST, PORT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-            
+
             //Sending request for categories
             output.writeUTF(REQUEST_CATEGORIES);
             output.flush();
@@ -47,7 +47,7 @@ public class QuestionController extends AbstractController {
             while (dataSent == null ? NO_MORE_CATEGORIES != null : !dataSent.equals(NO_MORE_CATEGORIES)) {
                 listCategories.add(dataSent);
                 dataSent = input.readUTF();
-                
+
             }
 
 
@@ -72,11 +72,12 @@ public class QuestionController extends AbstractController {
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-            
+
             //Sending request for categories
             output.writeUTF(NEW_QUESTION);
             output.flush();
 
+            //@TODO Solve IndexOutOfBoundsException
             output.writeUTF(categorySelected);
             output.writeUTF(question);
             output.writeUTF(rightAnswer);
