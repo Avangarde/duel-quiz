@@ -3,13 +3,9 @@ package util;
 import duel.quiz.server.Server;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,7 +16,7 @@ public class LoadBalancerFinder extends Thread {
     private Server sourceServer;
     private final int TIME_OUT = 5000;
     private final int port = 4444;
-    
+
 
     public LoadBalancerFinder(Server sourceServer) throws IOException {
         this("LoadBalancerFinder", sourceServer);
@@ -60,7 +56,7 @@ public class LoadBalancerFinder extends Thread {
                 while (sourceServer.getLoadBalancer() != null) {
                     buf = sourceServer.getLoadBalancer().getBytes();
                     InetAddress group = InetAddress.getByName("230.0.0.1");
-                    packet = new DatagramPacket(buf, buf.length, group, 4446);
+                    packet = new DatagramPacket(buf, buf.length, group, port);
                     System.out.println("Sending load balancer address: " + sourceServer.getLoadBalancer());
                     socket.send(packet);
                     try {
@@ -70,7 +66,7 @@ public class LoadBalancerFinder extends Thread {
                 }
             }
         } catch (IOException ex) {
-            System.err.print(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 

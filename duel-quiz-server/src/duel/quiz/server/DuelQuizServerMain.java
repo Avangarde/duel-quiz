@@ -33,7 +33,8 @@ public class DuelQuizServerMain implements Runnable {
         try {
             serverSocket = new ServerSocket(PORT_LISTENER);
         } catch (IOException ex) {
-            System.out.println("IO Exception");
+            System.err.println(ex.getMessage());
+            System.exit(0);
 //            Logger.getLogger(DuelQuizServerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
         //@TODO Update the availabilty list (Load at the beginning)
