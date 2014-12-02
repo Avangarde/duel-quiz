@@ -61,7 +61,7 @@ public class Server implements Comparable<Server> {
         }
         System.out.println("LOAD BALANCER FOUND!!!" + getLoadBalancerAddress());
         setStatus(DISPONIBLE);
-        //DuelQuizServerMain.main(new String[0]);
+        DuelQuizServerMain.main(new String[0]);
     }
 
     public String getAddress() {

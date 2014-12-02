@@ -46,7 +46,6 @@ public class LoadBalancerFinder extends Thread {
                 System.out.println("Waiting for load balancer address...");
                 socket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println("Addres: " + packet.getAddress());
                 System.out.println("Load Balancer: " + received);
                 sourceServer.setLoadBalancerAddress(received);
                 socket.leaveGroup(address);
