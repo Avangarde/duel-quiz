@@ -52,7 +52,7 @@ public class DuelQuizServerMain implements Runnable {
                 } catch (IOException ex) {
                     System.out.println("Cannot close socket");
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.err.println("Closing...");
                 if (socket != null) {
                     try {
@@ -115,6 +115,9 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case "RANDOMPLAY":
                 QuestionController.sendNewQuestions(out,in);
+                //@TODO Find an adversary in a new Thread
+                /*@TODO when found, send it to the player (see if after the 
+                questions)*/
                 break;
             case "REQUESTCATS":
                 //Transmits all categories

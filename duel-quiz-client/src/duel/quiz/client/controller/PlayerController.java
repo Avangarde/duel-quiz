@@ -4,13 +4,12 @@
  */
 package duel.quiz.client.controller;
 
-import static duel.quiz.client.controller.AbstractController.HOST;
+import duel.quiz.client.model.Answer;
+import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import duel.quiz.client.model.Question;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign-in a Player
+     *
      * @param player
      * @return
      */
@@ -65,6 +65,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign up a player
+     *
      * @param player
      * @return
      */
@@ -99,9 +100,10 @@ public class PlayerController extends AbstractController {
 
     /**
      * Must get a list with the player list
+     *
      * @return
      */
-    public List<String> fetchPlayerList(){
+    public List<String> fetchPlayerList() {
 //        Socket skClient;
 //        DataInputStream input;
 //        DataOutputStream output;
@@ -138,7 +140,6 @@ public class PlayerController extends AbstractController {
 
     /**
      * Request the server for a New Player and get the questions
-     *
      */
     public void requestRandomChallenge() {
         Socket skClient;
@@ -152,15 +153,40 @@ public class PlayerController extends AbstractController {
             output.writeUTF(RANDOMPLAY);
             output.flush();
 
-            //@TODO Receive the answers and deal with them
+            //Receive the answers and deal with them
+            Category category1 = new Category(input.readUTF());
+            Category category2 = new Category(input.readUTF());
+            Category category3 = new Category(input.readUTF());
+
+            List<Question> questionsCat1 = new ArrayList<Question>(3);
+            List<Question> questionsCat2 = new ArrayList<Question>(3);
+            List<Question> questionsCat3 = new ArrayList<Question>(3);
+
+            readQuestions(input, category1, questionsCat1);
+            readQuestions(input, category2, questionsCat2);
+            readQuestions(input, category3, questionsCat3);
 
             skClient.close();
+
+            //@TODO Answer the questions and send the answers to the server
+
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
         } catch (IOException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("IO Exception");
+        }
+    }
+
+    private void readQuestions(DataInputStream input, Category category, List<Question> questions) throws IOException {
+        for (int i = 0; i < 3; i++) {
+            Question question=new Question(-1, input.readUTF(), category);
+            questions.add(question);
+            for (int j = 0; j < 4; j++) {
+                Answer answer=new Answer(input.readLong(),input.readUTF(),input.readBoolean(),question);
+                question.getAnswers().add(answer);
+            }
         }
     }
 }

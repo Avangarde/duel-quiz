@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package duel.quiz.server.model;
+package duel.quiz.client.model;
 
 /**
- *
- * @author corteshs
+ * Created by juanmanuelmartinezromero on 02/12/14.
  */
 public class Category {
 
@@ -15,12 +10,13 @@ public class Category {
     public Category(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }   
+    }
 }
+

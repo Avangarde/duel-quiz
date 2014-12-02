@@ -6,7 +6,16 @@
 package duel.quiz.server.model.dao;
 
 import duel.quiz.server.model.Answer;
+import duel.quiz.server.model.Question;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +30,36 @@ public class AnswerDAO extends AbstractDataBaseDAO {
      * @return
      */
     public static List<Answer> getAnswers(long questionID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Answer> answers = null;
+        Connection connection = connect();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("SELECT * FROM Answer WHERE QuestionId = ?");
+            ps.setLong(1, questionID);
+            try (ResultSet resultSet = ps.executeQuery()) {
+                answers = new ArrayList<>();
+                while (resultSet.next()) {
+                    answers.add(new Answer(
+                            resultSet.getInt(1), 
+                            resultSet.getString(3), resultSet.getBoolean(4), 
+                            new Question(resultSet.getInt(2), null, null)));
+                }
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        List<Answer> retQuestions = new ArrayList<>(4);
+        java.util.Random r = new Random();
+        for (int i = 0; i < 4; i++) {
+            retQuestions.add(answers.remove(r.nextInt(answers.size())));
+        }
+        return retQuestions;
     }
-
 }
