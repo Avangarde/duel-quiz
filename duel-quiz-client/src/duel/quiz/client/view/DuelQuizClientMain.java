@@ -8,7 +8,10 @@ import duel.quiz.client.controller.PlayerController;
 import duel.quiz.client.controller.QuestionController;
 import duel.quiz.client.controller.TicketController;
 import duel.quiz.client.exception.ServerDownException;
+import duel.quiz.client.model.Answer;
+import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
+import duel.quiz.client.model.Question;
 import duel.quiz.client.model.Ticket;
 
 import java.io.*;
@@ -26,7 +29,6 @@ public class DuelQuizClientMain {
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     private static Player currentPlayer = null;
-
     private static Ticket ticket = null;
 
     /**
@@ -346,13 +348,48 @@ public class DuelQuizClientMain {
         }
         //@TODO request the user for a random Player and get the questions
         PlayerController playerController = new PlayerController(ticket.getServerAddress());
-        playerController.requestRandomChallenge();
+        List<Category> round = playerController.obtainCategoryQuestionsAnswers();
+        //Important to pass to server
+        Category categorySelected = new Category();
+        //@TODO Menu category pick
+
+        int option = -1;
+
+        while (option < 1 || option > 3) {
+
+            System.out.println("Choose a category:\n");
+
+            System.out.println("1. " + round.get(1).getName());
+            System.out.println("2. " + round.get(2).getName());
+            System.out.println("3. " + round.get(3).getName());
+            //System.out.println("4. Go back");
+
+            option = readInteger();
+
+            if (option > 0 && option < 4) {
+                categorySelected = round.get(option);
+
+            } else {
+                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
+
+            }
+        }
+        System.out.println("You chose Pikachu");
         //@TODO answer the questions and send them to the Server
-        //@TODO Server must request to the clients until someone accepts
-        //@TODO set in the local BD the status of the match (random Player - En attente)
-        //@TODO when in the server side someone accepts, update the local BD with the name and the score
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("First Question in " + categorySelected.getName() + ":\n");
+        answerQuestion(categorySelected.getListQuestions().get(1), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerQuestion(categorySelected.getListQuestions().get(2), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerQuestion(categorySelected.getListQuestions().get(3), true);
+
+
+
     }
+    //@TODO Server must request to the clients until someone accepts
+    //@TODO set in the local BD the status of the match (random Player - En attente)
+    //@TODO when in the server side someone accepts, update the local BD with the name and the score
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
     private static void displayListPlayers() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -417,5 +454,48 @@ public class DuelQuizClientMain {
 
     public static void setTicket(Ticket ticket) {
         DuelQuizClientMain.ticket = ticket;
+    }
+
+    /**
+     *
+     * @param question the question obtained from the server
+     * @param isChallenger determines whether this client is the challenger or
+     * the challenged
+     */
+    private static void answerQuestion(Question question, boolean isChallenger) {
+        System.out.println(question.getQuestion() + "\n");
+        int option = -1;
+        while (option < 1 || option > 4) {
+            int index = 1;
+            for (Answer each : question.getAnswers()) {
+                System.out.println(index + " " + each + "\n");
+                index++;
+            }
+
+            option = readInteger();
+        }
+
+        //Si no eres el retador eres el retado
+        if (!isChallenger) {
+            for (Answer each : question.getAnswers()) {
+                if (each.isChosenByAdversary()) {
+                    System.out.println("Your enemy chose \"" + each.getAnswer() + "\" and...");
+                    if (each.isCorrect()) {
+                        System.out.println(ConsoleColors.ANSI_GREEN + "HE IS RIGHT!" + ConsoleColors.ANSI_RESET);
+                    } else {
+                        System.out.println(ConsoleColors.ANSI_RED + "HE IS WRONG!!!!!!!!!!!" + ConsoleColors.ANSI_RESET);
+                    }
+                }
+            }
+        }else{
+            question.getAnswers().get(option).setChosenByAdversary(true);
+        }
+
+        if (question.getAnswers().get(option).isCorrect()) {
+            System.out.println(ConsoleColors.ANSI_GREEN + "YOU ARE RIGHT!" + ConsoleColors.ANSI_RESET);
+        } else {
+            System.out.println(ConsoleColors.ANSI_RED + "YOU ARE WRONG!!!!!!!!!!!" + ConsoleColors.ANSI_RESET);
+        }
+
     }
 }

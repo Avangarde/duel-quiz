@@ -8,6 +8,7 @@ import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
+import duel.quiz.client.view.ConsoleColors;
 
 import java.io.*;
 import java.net.Socket;
@@ -35,6 +36,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign-in a Player
+     *
      * @param player
      * @return
      */
@@ -73,6 +75,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Sign up a player
+     *
      * @param player
      * @return
      */
@@ -107,6 +110,7 @@ public class PlayerController extends AbstractController {
 
     /**
      * Must get a list with the player list
+     *
      * @return
      */
     public List<String> fetchPlayerList() {
@@ -148,7 +152,8 @@ public class PlayerController extends AbstractController {
      * Request the server for a New Player and get the questions
      *
      */
-    public void requestRandomChallenge() {
+    public List<Category> obtainCategoryQuestionsAnswers() {
+        List<Category> ret= new ArrayList<>();
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -172,11 +177,21 @@ public class PlayerController extends AbstractController {
             readQuestions(input, category1, questionsCat1);
             readQuestions(input, category2, questionsCat2);
             readQuestions(input, category3, questionsCat3);
+            
+            category1.setListQuestions(questionsCat1);
+            category2.setListQuestions(questionsCat2);
+            category3.setListQuestions(questionsCat3);
+            
+            ret.add(category1);
+            ret.add(category2);
+            ret.add(category3);
 
             //@TODO Receive the answers and deal with them
             skClient.close();
 
             //@TODO Answer the questions and send the answers to the server
+
+                      
 
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -184,15 +199,17 @@ public class PlayerController extends AbstractController {
         } catch (IOException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("IO Exception");
+        }finally{
+            return ret;
         }
     }
 
     private void readQuestions(DataInputStream input, Category category, List<Question> questions) throws IOException {
         for (int i = 0; i < 3; i++) {
-            Question question=new Question(-1, input.readUTF(), category);
+            Question question = new Question(-1, input.readUTF(), category);
             questions.add(question);
             for (int j = 0; j < 4; j++) {
-                Answer answer=new Answer(input.readLong(),input.readUTF(),input.readBoolean(),question);
+                Answer answer = new Answer(input.readLong(), input.readUTF(), input.readBoolean(), question);
                 question.getAnswers().add(answer);
             }
         }

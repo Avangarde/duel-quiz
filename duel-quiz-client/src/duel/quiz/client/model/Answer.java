@@ -4,10 +4,20 @@ package duel.quiz.client.model;
  * Created by juanmanuelmartinezromero on 02/12/14.
  */
 public class Answer {
+
     private long answerID;
     private String answer;
     private boolean correct;
+    //Added because of reasons
+    private boolean chosenByAdversary = false;
 
+    public boolean isChosenByAdversary() {
+        return chosenByAdversary;
+    }
+
+    public void setChosenByAdversary(boolean chosenByAdversary) {
+        this.chosenByAdversary = chosenByAdversary;
+    }
     private Question questionID;
 
     public Answer(long answerID, String answer, boolean correct, Question questionID) {
@@ -49,4 +59,3 @@ public class Answer {
         this.questionID = questionID;
     }
 }
-

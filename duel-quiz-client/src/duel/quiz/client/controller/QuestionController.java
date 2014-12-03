@@ -85,6 +85,8 @@ public class QuestionController extends AbstractController {
             output.writeUTF(wrongAnswers.remove(1));
 
             output.flush();
+            
+            //Final Status
             System.out.println(input.readUTF());
 
 
