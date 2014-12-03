@@ -7,6 +7,7 @@ package duel.quiz.server.model.dao;
 import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Question;
 import static duel.quiz.server.model.dao.AbstractDataBaseDAO.closeConnection;
+import static duel.quiz.server.model.dao.AbstractDataBaseDAO.connect;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,14 +24,29 @@ import java.util.logging.Logger;
  */
 public class QuestionDAO extends AbstractDataBaseDAO {
 
+    /*
+    
+    public static boolean createNewQuestion(Category category, String question) {
+
+        Connection connection = connect();
+        PreparedStatement stmnt;
+        boolean ret = false;
+
+        return ret;
+
+
+
+
+    }
+    * */
+
     public static List<Category> getAllCategories() {
         List<Category> listCategories = new ArrayList<>();
         Connection connection = connect();
         PreparedStatement stmnt;
         try {
             stmnt = connection.prepareStatement(
-                    "SELECT * FROM Category"
-            );
+                    "SELECT * FROM Category");
             ResultSet rslt = stmnt.executeQuery();
 
             while (rslt.next()) {
@@ -93,6 +109,7 @@ public class QuestionDAO extends AbstractDataBaseDAO {
 
     /**
      * Returns a list of categories with available questions
+     *
      * @return
      */
     //@TODO at least 4 !
@@ -102,8 +119,7 @@ public class QuestionDAO extends AbstractDataBaseDAO {
         PreparedStatement stmnt;
         try {
             stmnt = connection.prepareStatement(
-                    "Select DISTINCT CATEGORY.* from CATEGORY,QUESTION WHERE CATEGORY.CATEGORYNAME=QUESTION.CATEGORYNAME"
-            );
+                    "Select DISTINCT CATEGORY.* from CATEGORY,QUESTION WHERE CATEGORY.CATEGORYNAME=QUESTION.CATEGORYNAME");
             ResultSet rslt = stmnt.executeQuery();
 
             while (rslt.next()) {
