@@ -6,9 +6,13 @@ package duel.quiz.server;
 
 import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.PlayerController;
+import duel.quiz.server.controller.TicketController;
 import duel.quiz.server.model.Player;
+import duel.quiz.server.model.Ticket;
+
 import java.io.*;
 import java.net.*;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,14 +25,22 @@ public class DuelQuizServerMain implements Runnable {
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     private static Socket socket = null;
     private static ServerSocket serverSocket;
+    private static Server server;
+    //Port to listen the clients
+    private static int PORT_LISTENER = 5000;
+    private static final String GET_CLIENTS = "GET CLIENTS";
+    private static final String ADD_CLIENT = "ADD CLIENT";
 
     /**
      * @param args the command line arguments
+     * @throws UnknownHostException
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException {
+        //Initialize server
+        server = new Server();
+        server.init();
 
-        //Port to listen the clients
-        int PORT_LISTENER = 5000;
+
         try {
             serverSocket = new ServerSocket(PORT_LISTENER);
         } catch (IOException ex) {
@@ -114,10 +126,10 @@ public class DuelQuizServerMain implements Runnable {
                 String userChallenged = in.readUTF();
                 break;
             case "RANDOMPLAY":
-                QuestionController.sendNewQuestions(out,in);
+                QuestionController.sendNewQuestions(out, in);
                 //@TODO Find an adversary in a new Thread
                 /*@TODO when found, send it to the player (see if after the 
-                questions)*/
+                 questions)*/
                 break;
             case "REQUESTCATS":
                 //Transmits all categories
@@ -125,6 +137,18 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case "NEWQUESTION":
                 QuestionController.createNewQuestion(out, in);
+                break;
+            case GET_CLIENTS:
+                int numberOfClients = TicketController.validateTickets(server);
+                out.writeInt(numberOfClients);
+                output = true;
+                break;
+            case ADD_CLIENT:
+                String clientAddress = in.readUTF();
+                Ticket ticket = new Ticket();                
+                ticket.setClientAddress(clientAddress);
+                ticket.setLastConnexion(new Date());
+                output = true;
                 break;
             default:
                 //the message is not compliant with any other message

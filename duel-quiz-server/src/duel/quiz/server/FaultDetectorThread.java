@@ -43,23 +43,23 @@ public class FaultDetectorThread extends Thread {
             if (server.isLoadBalancer()) {
                 Iterator<Server> iterator = server.getServers().iterator();
                 while (iterator.hasNext()) {
-                    Server next = iterator.next();
+                    Server current = iterator.next();
                     try {
-                        socket = new Socket(next.getAddress(), port);
+                        socket = new Socket(current.getAddress(), port);
                         socket.setSoTimeout(TIME_OUT);
                         DataInputStream input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                         DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 
                         //Sending ping to server
                         output.writeUTF(PING);
-                        System.out.println("Ping to : " + server.getAddress());
+                        System.out.println("Ping to : " + current.getAddress());
                         output.flush();
                         input.readBoolean();
 
                         socket.close();
                     } catch (SocketTimeoutException | ConnectException ex) {
                         //@TODO Server Down
-                        System.err.println("Server down: " + next.getAddress());
+                        System.err.println("Server down: " + current.getAddress());
                     } catch (IOException ex) {
                         Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
                     }

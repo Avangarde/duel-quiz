@@ -18,14 +18,15 @@ public class LoadBalancerFinder extends Thread {
 
     private Server sourceServer;
     private final int TIME_OUT = 5000;
-    private final int port = 4444;
+    private final int PORT = 4444;
+    private static final String MULTICAST_HOST = "224.0.0.1";
 
 
-    public LoadBalancerFinder(Server sourceServer) throws IOException {
+    public LoadBalancerFinder(Server sourceServer) {
         this("LoadBalancerFinder", sourceServer);
     }
 
-    public LoadBalancerFinder(String name, Server sourceServer) throws IOException {
+    public LoadBalancerFinder(String name, Server sourceServer) {
         super(name);
         this.sourceServer = sourceServer;
     }
@@ -33,8 +34,9 @@ public class LoadBalancerFinder extends Thread {
     @Override
     public void run() {
         try {
-            MulticastSocket socket = new MulticastSocket(port);
-            InetAddress address = InetAddress.getByName("230.0.0.1");
+            MulticastSocket socket = new MulticastSocket(PORT);
+            InetAddress address = InetAddress.getByName(MULTICAST_HOST);
+            byte[] address1 = address.getAddress();;
             socket.joinGroup(address);
 
             byte[] buf = new byte[256];
@@ -76,8 +78,8 @@ public class LoadBalancerFinder extends Thread {
                 buf = new byte[256];                                
                 while (sourceServer.getLoadBalancerAddress() != null) {
                     buf = sourceServer.getLoadBalancerAddress().getBytes();
-                    InetAddress group = InetAddress.getByName("230.0.0.1");
-                    packet = new DatagramPacket(buf, buf.length, group, port);
+                    InetAddress group = InetAddress.getByName(MULTICAST_HOST);
+                    packet = new DatagramPacket(buf, buf.length, group, PORT);
                     System.out.println("Sending load balancer address: " + sourceServer.getLoadBalancerAddress());
                     socket.send(packet);
                     try {

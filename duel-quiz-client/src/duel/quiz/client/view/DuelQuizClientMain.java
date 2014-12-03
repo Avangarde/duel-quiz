@@ -337,11 +337,7 @@ public class DuelQuizClientMain {
 
     private static void randomChallenge() {
         try {
-            if (ticket == null) {
-                ticket = TicketController.getNewTicket();
-            } else {
-                ticket = TicketController.validateTicket(ticket);
-            }
+            ticket = TicketController.validateTicket(ticket);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             return;

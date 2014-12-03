@@ -1,12 +1,14 @@
 package duel.quiz.server;
 
-import java.io.IOException;
+import duel.quiz.server.model.Ticket;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import util.LoadBalancerFinder;
@@ -25,6 +27,7 @@ public class Server implements Comparable<Server> {
 
     private Date lastConnexion;
     private int numberOfClients;
+    List<Ticket> tickets;
 
     private LinkedList<String> queueDB;
     public static final String NO_DISPONIBLE = "NO_DISPONIBLE";
@@ -42,6 +45,8 @@ public class Server implements Comparable<Server> {
         servers = null;
         //@TODO: Get that from somewhere
         lastConnexion = new Date();
+        numberOfClients = 0;
+        tickets = new ArrayList<>();
     }
     
     public Server(String address) {
@@ -49,9 +54,11 @@ public class Server implements Comparable<Server> {
         this.loadBalancer = false;
         this.status = NO_DISPONIBLE;
         servers = null;
+        numberOfClients = 0;
+        tickets = new ArrayList<>();
     }
 
-    public void init() throws IOException {
+    public void init() {
         new LoadBalancerFinder(this).start();
         while (getLoadBalancerAddress() == null) {
             try {
@@ -61,7 +68,6 @@ public class Server implements Comparable<Server> {
         }
         System.out.println("LOAD BALANCER FOUND!!!" + getLoadBalancerAddress());
         setStatus(DISPONIBLE);
-        DuelQuizServerMain.main(new String[0]);
     }
 
     public String getAddress() {
@@ -135,6 +141,14 @@ public class Server implements Comparable<Server> {
         this.numberOfClients = numberOfClients;
     }
 
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Server)) {
@@ -158,10 +172,6 @@ public class Server implements Comparable<Server> {
     @Override
     public int compareTo(Server o) {
         return getAddress().compareTo(o.getAddress());
-    }
-
-    public static void main(String[] args) throws IOException {
-        new Server().init();
     }
     
 }

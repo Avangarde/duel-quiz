@@ -5,12 +5,14 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,8 +28,10 @@ public class LoadBalancerThread extends Thread {
     private final int port = 4466;
     private final int TIME_OUT = 5000;
     private final String DATE_FORMAT = Server.DATE_FORMAT;
-
-    public static final String REGISTER = "REGISTER";
+    private static final String REGISTER = "REGISTER";
+    private static final String GET_SERVER = "GET SERVER";
+    private static final String GET_CLIENTS = "GET CLIENTS";
+    private static final String ADD_CLIENT = "ADD CLIENT";
 
     public LoadBalancerThread(Server server) throws IOException {
         this("FaultDetectorThread", server);
@@ -154,6 +158,15 @@ public class LoadBalancerThread extends Thread {
                 //@TODO send info to others servers ? 
                 break;
 
+            case GET_SERVER:
+                Server minCharged = selectServer();
+
+                System.out.println("Sending server address: " + minCharged.getAddress()
+                        + " to client " + socket.getInetAddress());
+                out.writeUTF(minCharged.getAddress());
+                out.flush();
+                break;
+
             default:
                 //the message is not compliant with any other message
                 break;
@@ -170,4 +183,65 @@ public class LoadBalancerThread extends Thread {
         return format.format(date);
     }
 
+    private Server selectServer() {
+        Iterator<Server> iterator = server.getServers().iterator();
+        Server minCharged = server;
+        Socket socketToServer;
+        int portToServer = 5000;
+        while (iterator.hasNext()) {
+            Server current = iterator.next();
+            try {
+                socketToServer = new Socket(current.getAddress(), portToServer);
+                socketToServer.setSoTimeout(TIME_OUT);
+                DataInputStream input = new DataInputStream(new BufferedInputStream(socketToServer.getInputStream()));
+                DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socketToServer.getOutputStream()));
+
+                //Sending request to server
+                output.writeUTF(GET_CLIENTS);
+                System.out.println("Getting clients from : " + current.getAddress());
+                output.flush();
+                int numClients = input.readInt();
+                current.setNumberOfClients(numClients);
+                input.readBoolean();
+
+                if (current.getNumberOfClients() < minCharged.getNumberOfClients()) {
+                    minCharged = current;
+                }
+                socketToServer.close();
+            } catch (SocketTimeoutException | ConnectException ex) {
+                //@TODO Server Down
+                System.err.println("Server down: " + current.getAddress());
+            } catch (IOException ex) {
+                Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        //Send message to update number of clients of server
+        String clientAddress = socket.getInetAddress().toString();
+        try {
+            socketToServer = new Socket(minCharged.getAddress(), portToServer);
+            socketToServer.setSoTimeout(TIME_OUT);
+            DataInputStream input = new DataInputStream(new BufferedInputStream(socketToServer.getInputStream()));
+            DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socketToServer.getOutputStream()));
+
+            //Sending message to server
+            output.writeUTF(ADD_CLIENT);
+            System.out.println("Adding client " + clientAddress + 
+                    " to server : " + minCharged.getAddress());
+            output.writeUTF(clientAddress);
+            output.flush();
+
+            if (input.readBoolean()) {
+                minCharged.setNumberOfClients(minCharged.getNumberOfClients() + 1);
+            }
+            
+
+            socketToServer.close();
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server Down
+            System.err.println("Server down: " + minCharged.getAddress());
+        } catch (IOException ex) {
+            Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return minCharged;
+    }
 }
