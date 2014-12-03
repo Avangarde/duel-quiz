@@ -26,7 +26,6 @@ public class DuelQuizClientMain {
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
     private static Player currentPlayer = null;
-
     private static Ticket ticket = null;
 
     /**
@@ -335,11 +334,7 @@ public class DuelQuizClientMain {
 
     private static void randomChallenge() {
         try {
-            if (ticket == null) {
-                ticket = TicketController.getNewTicket();
-            } else {
-                ticket = TicketController.validateTicket(ticket);
-            }
+            ticket = TicketController.validateTicket(ticket);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             return;
