@@ -106,7 +106,7 @@ public class QuestionController extends AbstractController {
         return true;
     }
 
-    public void transmitPlayedData(Category categorySelected) {
+    public void transmitPlayedData(Category categorySelected, String user) {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -120,6 +120,8 @@ public class QuestionController extends AbstractController {
             output.writeUTF(SENDING_ROUND_DATA);
             output.flush();
 
+            output.writeUTF(user);
+            
             //@TODO Solve IndexOutOfBoundsException
             output.writeUTF(categorySelected.getName());
             

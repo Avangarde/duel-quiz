@@ -349,10 +349,9 @@ public class DuelQuizClientMain {
         //Important to pass to server
         Category categorySelected = pickCategory(round);
 
-        System.out.println("You chose Pikachu");
         answerAllQuestions(categorySelected);
 
-        new QuestionController().transmitPlayedData(categorySelected);
+        new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser());
 
     }
     //@TODO Server must request to the clients until someone accepts
