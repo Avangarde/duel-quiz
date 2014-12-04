@@ -349,27 +349,8 @@ public class DuelQuizClientMain {
         Category categorySelected = new Category();
         //@TODO Menu category pick
 
-        int option = -1;
+        categorySelected = pickCategory(round);
 
-        while (option < 1 || option > 3) {
-
-            System.out.println("Choose a category:\n");
-
-            System.out.println("1. " + round.get(1).getName());
-            System.out.println("2. " + round.get(2).getName());
-            System.out.println("3. " + round.get(3).getName());
-            //System.out.println("4. Go back");
-
-            option = readInteger();
-
-            if (option > 0 && option < 4) {
-                categorySelected = round.get(option);
-
-            } else {
-                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
-
-            }
-        }
         System.out.println("You chose Pikachu");
         //@TODO answer the questions and send them to the Server
         System.out.println("First Question in " + categorySelected.getName() + ":\n");
@@ -378,8 +359,8 @@ public class DuelQuizClientMain {
         answerQuestion(categorySelected.getListQuestions().get(2), true);
         System.out.println("Second Question in " + categorySelected.getName() + ":\n");
         answerQuestion(categorySelected.getListQuestions().get(3), true);
-
-
+        
+        transmitPlayedData(categorySelected);
 
     }
     //@TODO Server must request to the clients until someone accepts
@@ -471,7 +452,7 @@ public class DuelQuizClientMain {
             option = readInteger();
         }
 
-        //Si no eres el retador eres el retado
+        //If not challenger then challenged
         if (!isChallenger) {
             for (Answer each : question.getAnswers()) {
                 if (each.isChosenByAdversary()) {
@@ -483,7 +464,7 @@ public class DuelQuizClientMain {
                     }
                 }
             }
-        }else{
+        } else {
             question.getAnswers().get(option).setChosenByAdversary(true);
         }
 
@@ -493,5 +474,33 @@ public class DuelQuizClientMain {
             System.out.println(ConsoleColors.ANSI_RED + "YOU ARE WRONG!!!!!!!!!!!" + ConsoleColors.ANSI_RESET);
         }
 
+    }
+
+    private static Category pickCategory(List<Category> round) {
+        int option = -1;
+        Category ret = new Category();
+
+        while (option < 1 || option > 3) {
+
+            System.out.println("Choose a category:\n");
+
+            System.out.println("1. " + round.get(1).getName());
+            System.out.println("2. " + round.get(2).getName());
+            System.out.println("3. " + round.get(3).getName());
+            //System.out.println("4. Go back");
+
+            option = readInteger();
+
+            if (option > 0 && option < 4) {
+                ret = round.get(option);
+            } else {
+                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
+            }
+        }
+        return ret;
+    }
+
+    private static void transmitPlayedData(Category categorySelected) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
