@@ -206,23 +206,25 @@ public class QuestionController {
             //I am so sorry for this code :/
             ret.setListQuestions(new ArrayList<Question>());
             ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
+            ret.getListQuestions().get(0).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
             ret.getListQuestions().get(1).setAnswers(new ArrayList<Answer>());
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
-            ret.getListQuestions().get(2).setAnswers(new ArrayList<Answer>());
-            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
-            ret.getListQuestions().get(3).setAnswers(new ArrayList<Answer>());
-            ret.getListQuestions().get(3).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(3).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(3).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(3).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            
+            System.out.println("TODO LO RECIBI BIEEEEEEN" + '\n');
             
             //TODO Database operations
 
