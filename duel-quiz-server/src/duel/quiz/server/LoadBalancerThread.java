@@ -203,6 +203,9 @@ public class LoadBalancerThread extends Thread {
                 output.flush();
                 int numClients = input.readInt();
                 current.setNumberOfClients(numClients);
+                for (int i = 0; i < numClients; i++) {
+                    input.readUTF();
+                }
                 input.readBoolean();
 
                 if (current.getNumberOfClients() < minCharged.getNumberOfClients()) {

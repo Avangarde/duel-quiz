@@ -141,6 +141,9 @@ public class DuelQuizServerMain implements Runnable {
             case GET_CLIENTS:
                 int numberOfClients = TicketController.validateTickets(server);
                 out.writeInt(numberOfClients);
+                for (Ticket t : server.getTickets()) {
+                    out.writeUTF(t.getClientAddress());
+                }
                 output = true;
                 break;
             case ADD_CLIENT:
