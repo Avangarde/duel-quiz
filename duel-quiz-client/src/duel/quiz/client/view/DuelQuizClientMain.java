@@ -139,8 +139,9 @@ public class DuelQuizClientMain {
                 }
             } catch (ServerDownException ex) {
                 System.err.println("Server down :(");
+                ticket = null;
             }
-
+            valid = false;
             while (!signed && !failed && !valid) {
                 System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
                 System.out.println("\t1. Yes");
@@ -359,7 +360,7 @@ public class DuelQuizClientMain {
         answerQuestion(categorySelected.getListQuestions().get(2), true);
         System.out.println("Second Question in " + categorySelected.getName() + ":\n");
         answerQuestion(categorySelected.getListQuestions().get(3), true);
-        
+
         transmitPlayedData(categorySelected);
 
     }

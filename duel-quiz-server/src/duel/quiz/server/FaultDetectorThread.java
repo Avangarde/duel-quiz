@@ -27,6 +27,8 @@ public class FaultDetectorThread extends Thread {
     private final int TIME_OUT = 5000;
     private final int port = 4455;
     private final String PING = "PING";
+    
+    private boolean running;
 
     public FaultDetectorThread(Server server) throws IOException {
         this("FaultDetectorThread", server);
@@ -34,12 +36,13 @@ public class FaultDetectorThread extends Thread {
 
     public FaultDetectorThread(String name, Server server) throws IOException {
         super(name);
-        this.server = server;
+        this.server = server;        
     }
 
     @Override
     public void run() {
-        while (true) {
+        this.running = true;
+        while (running) {
             if (server.isLoadBalancer()) {
                 Iterator<Server> iterator = server.getServers().iterator();
                 while (iterator.hasNext()) {
@@ -88,7 +91,9 @@ public class FaultDetectorThread extends Thread {
                 } catch (SocketTimeoutException ex) {
                     //@TODO Load Balancer fault 
                     System.err.println("Load Balancer Down");
-                    // new LoadBalancerFinder(server).start(); ?
+                    
+                    running = false;
+                    new LoadBalancerFinder(server).start();
                 } catch (Exception e) {
                     System.err.println("Closing...");
                     if (socket != null) {
@@ -108,6 +113,11 @@ public class FaultDetectorThread extends Thread {
                     }
                 }
             }
+        }
+        try {
+            this.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

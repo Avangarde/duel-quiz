@@ -74,7 +74,8 @@ public class TicketController {
             ticket = new Ticket();
             ticket.setServerAddress(address);
             ticket.setLastConnexion(new Date());
-
+        } catch (SocketTimeoutException ex) {
+            throw new ServerDownException("Server down");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
