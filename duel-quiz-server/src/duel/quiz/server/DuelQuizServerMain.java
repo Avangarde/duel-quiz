@@ -32,6 +32,8 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
+    
+    private static PlayerController playerController = new PlayerController();
 
     /**
      * @param args the command line arguments
@@ -150,8 +152,8 @@ public class DuelQuizServerMain implements Runnable {
             case GET_CLIENTS:
                 int numberOfClients = TicketController.validateTickets(server);
                 out.writeInt(numberOfClients);
-                for (Ticket t : server.getTickets()) {
-                    out.writeUTF(t.getClientAddress());
+                for (Ticket ti : server.getTickets()) {
+                    out.writeUTF(ti.getClientAddress());
                 }
                 output = true;
                 break;
