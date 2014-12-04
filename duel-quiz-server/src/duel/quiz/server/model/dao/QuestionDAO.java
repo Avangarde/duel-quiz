@@ -26,20 +26,19 @@ public class QuestionDAO extends AbstractDataBaseDAO {
 
     /*
     
-    public static boolean createNewQuestion(Category category, String question) {
+     public static boolean createNewQuestion(Category category, String question) {
 
-        Connection connection = connect();
-        PreparedStatement stmnt;
-        boolean ret = false;
+     Connection connection = connect();
+     PreparedStatement stmnt;
+     boolean ret = false;
 
-        return ret;
-
-
+     return ret;
 
 
-    }
-    * */
 
+
+     }
+     * */
     public static List<Category> getAllCategories() {
         List<Category> listCategories = new ArrayList<>();
         Connection connection = connect();
@@ -137,5 +136,32 @@ public class QuestionDAO extends AbstractDataBaseDAO {
             }
         }
         return listCategories;
+    }
+
+    public static long getByName(String question) {
+        long ret = -1;
+        Connection connection = connect();
+        PreparedStatement stmnt;
+        try {
+            stmnt = connection.prepareStatement(
+                    "SELECT * FROM Question WHERE categoryname = ?");
+            stmnt.setString(1, question);
+            ResultSet rslt = stmnt.executeQuery();
+
+            if (rslt.next()) {
+                ret = rslt.getLong("questionid");
+            }
+            rslt.close();
+            stmnt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return ret;
     }
 }

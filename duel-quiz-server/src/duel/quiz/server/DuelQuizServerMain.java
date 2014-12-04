@@ -153,9 +153,10 @@ public class DuelQuizServerMain implements Runnable {
                 output = true;
                 break;
             case SENDING_ROUND_DATA:
-                Category received = QuestionController.receivePlayedData(1,out, in);
-                QuestionController.transmitAdversaryPlayedData(received, out, in);
-                QuestionController.sendNewQuestions(out, in);
+                QuestionController.receivePlayedData(1,out, in);
+                
+                //QuestionController.transmitAdversaryPlayedData(received, out, in);
+                //QuestionController.sendNewQuestions(out, in);
 
             default:
                 //the message is not compliant with any other message

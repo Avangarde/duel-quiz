@@ -8,8 +8,10 @@ import duel.quiz.server.model.Answer;
 import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Question;
 import duel.quiz.server.model.dao.AnswerDAO;
+import duel.quiz.server.model.dao.DuelDAO;
 import java.util.List;
 import duel.quiz.server.model.dao.QuestionDAO;
+import duel.quiz.server.model.dao.RoundDAO;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -199,6 +201,10 @@ public class QuestionController {
         Category ret = new Category();
         
         try {
+            
+            //User
+            String user = in.readUTF();
+            
             //Name
             ret.setName(in.readUTF());
             
@@ -218,15 +224,52 @@ public class QuestionController {
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
-            ret.getListQuestions().get(1).setAnswers(new ArrayList<Answer>());
-            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(2).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             
             System.out.println("TODO LO RECIBI BIEEEEEEN" + '\n');
             
             //TODO Database operations
+            
+            //Obtain questions IDS
+            
+            ret.getListQuestions().get(0).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(0).getQuestion()));
+            ret.getListQuestions().get(1).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(1).getQuestion()));
+            ret.getListQuestions().get(2).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(2).getQuestion()));
+            
+            //@TODO Obtain Answers Ids
+            List<Answer> answersToPersist = new ArrayList<>();
+            
+            for (Question each : ret.getListQuestions()){
+                for (Answer each2 : each.getAnswers()){
+                    if (each2.isChosenByAdversary()){
+                        each2.setAnswerID(AnswerDAO.getByString(each2.getAnswer()));
+                        answersToPersist.add(each2);
+                    }
+                }
+            }
+            
+            //Duel
+            int duelID = DuelDAO.create("WAITING");
+            DuelDAO.linkPlayerToDuel(user,duelID);
+            
+            //Round
+            int roundID = RoundDAO.create(duelID, ret.getName());
+            RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(0).getQuestionID());
+            RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(1).getQuestionID());
+            RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(2).getQuestionID());
+            
+            //Add Player Answers
+            
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID());
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID());
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID());
+            
+            //Update Duel points
+            DuelDAO.updateScore(duelID);
 
             //TODO Persist
             out.writeUTF("Persisted :)");

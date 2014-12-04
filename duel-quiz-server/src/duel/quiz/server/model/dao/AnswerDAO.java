@@ -7,10 +7,13 @@ package duel.quiz.server.model.dao;
 
 import duel.quiz.server.model.Answer;
 import duel.quiz.server.model.Question;
+import static duel.quiz.server.model.dao.AbstractDataBaseDAO.closeConnection;
+import static duel.quiz.server.model.dao.AbstractDataBaseDAO.connect;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,8 +43,8 @@ public class AnswerDAO extends AbstractDataBaseDAO {
                 answers = new ArrayList<>();
                 while (resultSet.next()) {
                     answers.add(new Answer(
-                            resultSet.getInt(1), 
-                            resultSet.getString(3), resultSet.getBoolean(4), 
+                            resultSet.getInt(1),
+                            resultSet.getString(3), resultSet.getBoolean(4),
                             new Question(resultSet.getInt(2), null, null)));
                 }
             }
@@ -61,5 +64,58 @@ public class AnswerDAO extends AbstractDataBaseDAO {
             retQuestions.add(answers.remove(r.nextInt(answers.size())));
         }
         return retQuestions;
+    }
+
+    public static boolean linkPlayerToAnswer(String user, long answerID) {
+        Connection connection = connect();
+        boolean ret = false;
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerAnswer "
+                    + "Values (?,?)");
+            statement.setString(1, user);
+            statement.setLong(2, answerID);
+
+            statement.executeQuery();
+
+            statement.close();
+            connection.close();
+
+            ret = true;
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("User already exists");
+        } catch (SQLException e) {
+            System.out.println("Error");
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public static long getByString(String answer) {
+        long ret = -1;
+        Connection connection = connect();
+        PreparedStatement stmnt;
+        try {
+            stmnt = connection.prepareStatement(
+                    "SELECT * FROM Answer WHERE answer = ?");
+            stmnt.setString(1, answer);
+            ResultSet rslt = stmnt.executeQuery();
+
+            if (rslt.next()) {
+                ret = rslt.getLong("answerid");
+            }
+            rslt.close();
+            stmnt.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return ret;
     }
 }
