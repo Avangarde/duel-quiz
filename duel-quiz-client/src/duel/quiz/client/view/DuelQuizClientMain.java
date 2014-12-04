@@ -139,8 +139,9 @@ public class DuelQuizClientMain {
                 }
             } catch (ServerDownException ex) {
                 System.err.println("Server down :(");
+                ticket = null;
             }
-
+            valid = false;
             while (!signed && !failed && !valid) {
                 System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
                 System.out.println("\t1. Yes");
@@ -346,21 +347,12 @@ public class DuelQuizClientMain {
         PlayerController playerController = new PlayerController(ticket.getServerAddress());
         List<Category> round = playerController.obtainCategoryQuestionsAnswers();
         //Important to pass to server
-        Category categorySelected = new Category();
-        //@TODO Menu category pick
-
-        categorySelected = pickCategory(round);
+        Category categorySelected = pickCategory(round);
 
         System.out.println("You chose Pikachu");
-        //@TODO answer the questions and send them to the Server
-        System.out.println("First Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(1), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(2), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(3), true);
-        
-        transmitPlayedData(categorySelected);
+        answerAllQuestions(categorySelected);
+
+        new QuestionController().transmitPlayedData(categorySelected);
 
     }
     //@TODO Server must request to the clients until someone accepts
@@ -439,19 +431,20 @@ public class DuelQuizClientMain {
      * @param isChallenger determines whether this client is the challenger or
      * the challenged
      */
-    private static void answerQuestion(Question question, boolean isChallenger) {
+    private static void answerIndividualQuestion(Question question, boolean isChallenger) {
         System.out.println(question.getQuestion() + "\n");
         int option = -1;
         while (option < 1 || option > 4) {
             int index = 1;
             for (Answer each : question.getAnswers()) {
-                System.out.println(index + " " + each + "\n");
+                System.out.println(index + " " + each.getAnswer() + "\n");
                 index++;
             }
 
             option = readInteger();
         }
 
+        option--;
         //If not challenger then challenged
         if (!isChallenger) {
             for (Answer each : question.getAnswers()) {
@@ -484,15 +477,15 @@ public class DuelQuizClientMain {
 
             System.out.println("Choose a category:\n");
 
-            System.out.println("1. " + round.get(1).getName());
-            System.out.println("2. " + round.get(2).getName());
-            System.out.println("3. " + round.get(3).getName());
+            System.out.println("1. " + round.get(0).getName());
+            System.out.println("2. " + round.get(1).getName());
+            System.out.println("3. " + round.get(2).getName());
             //System.out.println("4. Go back");
 
             option = readInteger();
 
             if (option > 0 && option < 4) {
-                ret = round.get(option);
+                ret = round.get(option-1);
             } else {
                 System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
             }
@@ -500,7 +493,14 @@ public class DuelQuizClientMain {
         return ret;
     }
 
-    private static void transmitPlayedData(Category categorySelected) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    private static void answerAllQuestions(Category categorySelected) {
+        //@TODO answer the questions and send them to the Server
+        System.out.println("First Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(0), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(1), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
     }
 }

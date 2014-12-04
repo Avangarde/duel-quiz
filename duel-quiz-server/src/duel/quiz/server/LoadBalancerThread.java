@@ -122,11 +122,11 @@ public class LoadBalancerThread extends Thread {
         //Receiving protocol message from client/first handshake
         String message = in.readUTF();
         //Business logic
-        treatMessage(out, in, message);
+        treatMessage(out, in, message, socket);
         return socket;
     }
 
-    private void treatMessage(DataOutputStream out, DataInputStream in, String message) throws IOException {
+    private void treatMessage(DataOutputStream out, DataInputStream in, String message, Socket socket) throws IOException {
 
         //Method to treat the incoming messages.
         switch (message) {
@@ -159,7 +159,8 @@ public class LoadBalancerThread extends Thread {
                 break;
 
             case GET_SERVER:
-                Server minCharged = selectServer();
+                System.out.println("Selecting server...");
+                Server minCharged = selectServer(socket);
 
                 System.out.println("Sending server address: " + minCharged.getAddress()
                         + " to client " + socket.getInetAddress());
@@ -183,7 +184,7 @@ public class LoadBalancerThread extends Thread {
         return format.format(date);
     }
 
-    private Server selectServer() {
+    private Server selectServer(Socket socket) {
         Iterator<Server> iterator = server.getServers().iterator();
         Server minCharged = server;
         Socket socketToServer;
@@ -202,6 +203,9 @@ public class LoadBalancerThread extends Thread {
                 output.flush();
                 int numClients = input.readInt();
                 current.setNumberOfClients(numClients);
+                for (int i = 0; i < numClients; i++) {
+                    input.readUTF();
+                }
                 input.readBoolean();
 
                 if (current.getNumberOfClients() < minCharged.getNumberOfClients()) {

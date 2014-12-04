@@ -4,7 +4,10 @@
  */
 package duel.quiz.client.controller;
 
-
+import static duel.quiz.client.controller.AbstractController.PORT;
+import duel.quiz.client.model.Answer;
+import duel.quiz.client.model.Category;
+import duel.quiz.client.model.Question;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -24,6 +27,7 @@ public class QuestionController extends AbstractController {
     private static final String REQUEST_3_CATEGORIES = "REQUEST3CATS";
     private static final String NO_MORE_CATEGORIES = "ENDOFDATA";
     private static final String NEW_QUESTION = "NEWQUESTION";
+    private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
 
     public List<String> fetchAllCategories() {
         Socket skClient;
@@ -85,7 +89,7 @@ public class QuestionController extends AbstractController {
             output.writeUTF(wrongAnswers.remove(1));
 
             output.flush();
-            
+
             //Final Status
             System.out.println(input.readUTF());
 
@@ -100,5 +104,49 @@ public class QuestionController extends AbstractController {
         }
         //Empty if something went wrong
         return true;
+    }
+
+    public void transmitPlayedData(Category categorySelected) {
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        try {
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+
+            //Sending request for categories
+            output.writeUTF(SENDING_ROUND_DATA);
+            output.flush();
+
+            //@TODO Solve IndexOutOfBoundsException
+            output.writeUTF(categorySelected.getName());
+            
+            for (Question each : categorySelected.getListQuestions()){
+            
+            output.writeUTF(each.getQuestion());
+            //Repeats 4 times
+            for (Answer each2 : each.getAnswers()) {
+                output.writeUTF(each2.getAnswer());
+                output.writeBoolean(each2.isCorrect());
+                output.writeBoolean(each2.isChosenByAdversary());
+            }}
+            
+            output.flush();
+
+            //Final Status
+            System.out.println(input.readUTF());
+
+
+            skClient.close();
+        } catch (UnknownHostException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (IOException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IO Exception");
+        }
+        //Empty if something went wrong
     }
 }
