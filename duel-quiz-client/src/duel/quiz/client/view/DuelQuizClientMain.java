@@ -346,21 +346,12 @@ public class DuelQuizClientMain {
         PlayerController playerController = new PlayerController(ticket.getServerAddress());
         List<Category> round = playerController.obtainCategoryQuestionsAnswers();
         //Important to pass to server
-        Category categorySelected = new Category();
-        //@TODO Menu category pick
-
-        categorySelected = pickCategory(round);
+        Category categorySelected = pickCategory(round);
 
         System.out.println("You chose Pikachu");
-        //@TODO answer the questions and send them to the Server
-        System.out.println("First Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(1), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(2), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
-        answerQuestion(categorySelected.getListQuestions().get(3), true);
-        
-        transmitPlayedData(categorySelected);
+        answerAllQuestions(categorySelected);
+
+        new QuestionController().transmitPlayedData(categorySelected);
 
     }
     //@TODO Server must request to the clients until someone accepts
@@ -439,7 +430,7 @@ public class DuelQuizClientMain {
      * @param isChallenger determines whether this client is the challenger or
      * the challenged
      */
-    private static void answerQuestion(Question question, boolean isChallenger) {
+    private static void answerIndividualQuestion(Question question, boolean isChallenger) {
         System.out.println(question.getQuestion() + "\n");
         int option = -1;
         while (option < 1 || option > 4) {
@@ -500,7 +491,14 @@ public class DuelQuizClientMain {
         return ret;
     }
 
-    private static void transmitPlayedData(Category categorySelected) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    private static void answerAllQuestions(Category categorySelected) {
+        //@TODO answer the questions and send them to the Server
+        System.out.println("First Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(1), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(3), true);
     }
 }
