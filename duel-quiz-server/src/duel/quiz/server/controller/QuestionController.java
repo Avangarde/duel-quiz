@@ -193,4 +193,51 @@ public class QuestionController {
             }
         }
     }
+
+    public static Category receivePlayedData(int cases, DataOutputStream out, DataInputStream in) {
+        
+        Category ret = new Category();
+        
+        try {
+            //Name
+            ret.setName(in.readUTF());
+            
+            //Question
+            //I am so sorry for this code :/
+            ret.setListQuestions(new ArrayList<Question>());
+            ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
+            ret.getListQuestions().get(0).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(0).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
+            ret.getListQuestions().get(1).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().add(new Question(-1, in.readUTF(), ret));
+            ret.getListQuestions().get(1).setAnswers(new ArrayList<Answer>());
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            ret.getListQuestions().get(1).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
+            
+            System.out.println("TODO LO RECIBI BIEEEEEEN" + '\n');
+            
+            //TODO Database operations
+
+            //TODO Persist
+            out.writeUTF("Persisted :)");
+        } catch (IOException ex) {
+            Logger.getLogger(QuestionController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+        }
+        return ret;
+    }
+
+    public static void transmitAdversaryPlayedData(Category received, DataOutputStream out, DataInputStream in) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

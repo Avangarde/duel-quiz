@@ -14,6 +14,25 @@ public class Answer {
     private boolean correct;
     
     private Question questionID;
+    
+    //Added because of reasons
+    private boolean chosenByAdversary = false;
+
+    public boolean isChosenByAdversary() {
+        return chosenByAdversary;
+    }
+
+    public void setChosenByAdversary(boolean chosenByAdversary) {
+        this.chosenByAdversary = chosenByAdversary;
+    }
+
+    public Answer(String answer, boolean correct, boolean chosen) {
+        this.answer = answer;
+        this.correct = correct;
+        this.chosenByAdversary = chosen;
+    }
+    
+    
 
     public Answer(long answerID, String answer, boolean correct, Question questionID) {
         this.answerID = answerID;
