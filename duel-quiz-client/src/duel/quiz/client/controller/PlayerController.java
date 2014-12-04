@@ -4,6 +4,7 @@
  */
 package duel.quiz.client.controller;
 
+import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
@@ -40,7 +41,7 @@ public class PlayerController extends AbstractController {
      * @param player
      * @return
      */
-    public boolean signIn(Player player) {
+    public boolean signIn(Player player) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -65,9 +66,9 @@ public class PlayerController extends AbstractController {
             System.out.println("Unknown Host");
         } catch (SocketTimeoutException ex) {
             //@TODO Server fault 
-            System.err.println("Server down :(");
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ServerDownException("Server Down!");
 //            System.out.println("IO Exception");
         }
         return logged;

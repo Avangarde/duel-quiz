@@ -139,8 +139,9 @@ public class DuelQuizClientMain {
                 }
             } catch (ServerDownException ex) {
                 System.err.println("Server down :(");
+                ticket = null;
             }
-
+            valid = false;
             while (!signed && !failed && !valid) {
                 System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
                 System.out.println("\t1. Yes");
