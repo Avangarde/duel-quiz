@@ -437,13 +437,14 @@ public class DuelQuizClientMain {
         while (option < 1 || option > 4) {
             int index = 1;
             for (Answer each : question.getAnswers()) {
-                System.out.println(index + " " + each + "\n");
+                System.out.println(index + " " + each.getAnswer() + "\n");
                 index++;
             }
 
             option = readInteger();
         }
 
+        option--;
         //If not challenger then challenged
         if (!isChallenger) {
             for (Answer each : question.getAnswers()) {
@@ -476,15 +477,15 @@ public class DuelQuizClientMain {
 
             System.out.println("Choose a category:\n");
 
-            System.out.println("1. " + round.get(1).getName());
-            System.out.println("2. " + round.get(2).getName());
-            System.out.println("3. " + round.get(3).getName());
+            System.out.println("1. " + round.get(0).getName());
+            System.out.println("2. " + round.get(1).getName());
+            System.out.println("3. " + round.get(2).getName());
             //System.out.println("4. Go back");
 
             option = readInteger();
 
             if (option > 0 && option < 4) {
-                ret = round.get(option);
+                ret = round.get(option-1);
             } else {
                 System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
             }
@@ -496,10 +497,10 @@ public class DuelQuizClientMain {
     private static void answerAllQuestions(Category categorySelected) {
         //@TODO answer the questions and send them to the Server
         System.out.println("First Question in " + categorySelected.getName() + ":\n");
+        answerIndividualQuestion(categorySelected.getListQuestions().get(0), true);
+        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(1), true);
         System.out.println("Second Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
-        answerIndividualQuestion(categorySelected.getListQuestions().get(3), true);
     }
 }
