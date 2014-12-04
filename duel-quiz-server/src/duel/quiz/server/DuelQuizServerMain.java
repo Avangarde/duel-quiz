@@ -30,6 +30,8 @@ public class DuelQuizServerMain implements Runnable {
     private static int PORT_LISTENER = 5000;
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
+    
+    private static PlayerController playerController = new PlayerController();
 
     /**
      * @param args the command line arguments
@@ -49,8 +51,8 @@ public class DuelQuizServerMain implements Runnable {
 //            Logger.getLogger(DuelQuizServerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
         //@TODO Update the availabilty list (Load at the beginning) (TO DISCUSS !!)
-        PlayerController lc = new PlayerController();
-        Thread thread = new Thread(lc);
+        Thread thread;
+        thread = new Thread(playerController);
         thread.start();
         //Listening while running
         while (true) {
@@ -104,15 +106,17 @@ public class DuelQuizServerMain implements Runnable {
                 String pass = in.readUTF(); //Obtain pass
                 Player player = PlayerController.loginPlayer(user, pass);
                 if (player != null) {
+                    server.getTickets().indexOf(in);
+                    socket.getInetAddress();
+                    Ticket t = server.getTicketByAddres(socket.getInetAddress().toString());
+                    player.setTicket(t);
+                    t.setPlayer(player);
                     out.writeInt(player.getScore());
                     output = true;
                 } else {
                     out.writeInt(-1);
                     output = false;
                 }
-
-                //TODO Construct a model for the user
-                //TODO Set Variables in DAO
                 break;
 
             case "REGISTER":
@@ -128,6 +132,11 @@ public class DuelQuizServerMain implements Runnable {
             case "RANDOMPLAY":
                 QuestionController.sendNewQuestions(out, in);
                 //@TODO Find an adversary in a new Thread
+                String ad=socket.getInetAddress().toString();
+                Ticket t = server.getTicketByAddres(ad);
+                playerController.findAdversary(t.getPlayer().getUser(),ad,
+                        server.getLoadBalancerAddress());
+                
                 /*@TODO when found, send it to the player (see if after the 
                  questions)*/
                 break;
@@ -148,6 +157,7 @@ public class DuelQuizServerMain implements Runnable {
                 Ticket ticket = new Ticket();                
                 ticket.setClientAddress(clientAddress);
                 ticket.setLastConnexion(new Date());
+                server.tickets.add(ticket);
                 output = true;
                 break;
             default:

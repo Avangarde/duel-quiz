@@ -6,9 +6,17 @@
 package duel.quiz.server.controller;
 
 import duel.quiz.server.model.Player;
+import duel.quiz.server.model.Ticket;
 import duel.quiz.server.model.dao.PlayerDAO;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +33,9 @@ public class PlayerController implements Runnable {
      * Number of minutes to wait to remove a non-available user from the list
      */
     private static final int REMOVE_PLAYERS_MINUTES = 5;
+    private static final int LOAD_BALANCER_PORT = 4466;
+    private static final int TIME_OUT = 60000;
+    private static final String FIND_ADVERSARY="FIND_ADVERSARY";
     private static final HashMap<String, Long> availablePlayers = new HashMap<>();
 
     /**
@@ -79,6 +90,36 @@ public class PlayerController implements Runnable {
                 System.out.println("Removed player " + player);
                 //@TODO Update #players and send it to the LB
             }
+        }
+    }
+    
+    /**
+     * Finds an adversary to the specified client.
+     * @param user 
+     */
+    public void findAdversary(String user,String inetAddr,String loadBalancerAddr) {
+        Socket socket=null;
+        try {
+            socket= new Socket(loadBalancerAddr,LOAD_BALANCER_PORT);
+            socket.setSoTimeout(TIME_OUT);    
+         DataInputStream input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+
+            //Sending Get Server Message
+            output.writeUTF(FIND_ADVERSARY);
+            output.writeUTF(user);
+            output.writeUTF(inetAddr);
+            System.out.print("Finding Adversary ...");
+            output.flush();
+            //@TODO Create a new Thread waiting for the Adversary Adress
+//            String address = input.readUTF();
+//            System.out.println("..." + address);   
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (SocketTimeoutException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

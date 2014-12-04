@@ -17,14 +17,10 @@ public class Player {
     private String pass;
     private String state;
     private Integer score;
+    private Ticket ticket;
     //Foreign
     private List<Answer> listAnswers;
     private List<Duel> listDuels;
-
-    public Player(String user, String pass) {
-        this.user = user;
-        this.pass = pass;
-    }
 
     public Player(String user, String pass, String state, Integer score) {
         this.user = user;
@@ -91,5 +87,13 @@ public class Player {
 
     public void setListDuels(List<Duel> listDuels) {
         this.listDuels = listDuels;
+    }
+
+    public Ticket getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
     }
 }

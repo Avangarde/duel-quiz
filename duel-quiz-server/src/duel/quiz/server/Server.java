@@ -21,20 +21,15 @@ public class Server implements Comparable<Server> {
 
     private String address;
     private String status;
-
     private String loadBalancerAddress;
     private Boolean loadBalancer;
-
     private Date lastConnexion;
     private int numberOfClients;
     List<Ticket> tickets;
-
     private LinkedList<String> queueDB;
     public static final String NO_DISPONIBLE = "NO_DISPONIBLE";
     public static final String DISPONIBLE = "DISPONIBLE";
-    
     public static final String DATE_FORMAT = "dd/MM/YYYY HH:mm:ss";
-
     //Only for loadBalancer
     private TreeSet<Server> servers;
 
@@ -48,7 +43,7 @@ public class Server implements Comparable<Server> {
         numberOfClients = 0;
         tickets = new ArrayList<>();
     }
-    
+
     public Server(String address) {
         this.address = address;
         this.loadBalancer = false;
@@ -114,7 +109,7 @@ public class Server implements Comparable<Server> {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
         return format.format(lastConnexion);
     }
-    
+
     public Date getLastConnexionDate() {
         return lastConnexion;
     }
@@ -149,6 +144,24 @@ public class Server implements Comparable<Server> {
         this.tickets = tickets;
     }
 
+    /**
+     * get a ticket by the passed address, if the address is not correct, 
+     * returns null
+     *
+     * @param address
+     * @return
+     */
+    public Ticket getTicketByAddres(String address) {
+        Ticket ret=null;
+        for (Ticket ticket : tickets) {
+            if(ticket.getClientAddress().equals(address)){
+                ret=ticket;
+                break;
+            }
+        }
+        return ret;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Server)) {
@@ -167,11 +180,10 @@ public class Server implements Comparable<Server> {
         int hash = 7;
         hash = 67 * hash + Objects.hashCode(this.address);
         return hash;
-    }    
+    }
 
     @Override
     public int compareTo(Server o) {
         return getAddress().compareTo(o.getAddress());
     }
-    
 }

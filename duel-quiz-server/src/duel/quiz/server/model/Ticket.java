@@ -10,8 +10,17 @@ public class Ticket {
 
     private Date lastConnexion;
     private String clientAddress;
+    private Player player;
 
     public Ticket() {
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public Date getLastConnexion() {
@@ -29,5 +38,4 @@ public class Ticket {
     public void setClientAddress(String clientAddress) {
         this.clientAddress = clientAddress;
     }
-
 }
