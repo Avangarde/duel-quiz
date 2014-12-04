@@ -7,6 +7,7 @@ package duel.quiz.server;
 import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.PlayerController;
 import duel.quiz.server.controller.TicketController;
+import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.Ticket;
 
@@ -30,6 +31,7 @@ public class DuelQuizServerMain implements Runnable {
     private static int PORT_LISTENER = 5000;
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
+    private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
 
     /**
      * @param args the command line arguments
@@ -145,11 +147,16 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case ADD_CLIENT:
                 String clientAddress = in.readUTF();
-                Ticket ticket = new Ticket();                
+                Ticket ticket = new Ticket();
                 ticket.setClientAddress(clientAddress);
                 ticket.setLastConnexion(new Date());
                 output = true;
                 break;
+            case SENDING_ROUND_DATA:
+                Category received = QuestionController.receivePlayedData(1,out, in);
+                QuestionController.transmitAdversaryPlayedData(received, out, in);
+                QuestionController.sendNewQuestions(out, in);
+
             default:
                 //the message is not compliant with any other message
                 break;
