@@ -7,6 +7,7 @@ package duel.quiz.server;
 import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.PlayerController;
 import duel.quiz.server.controller.TicketController;
+import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.Ticket;
 import duel.quiz.server.model.dao.DuelDAO;
@@ -14,6 +15,7 @@ import duel.quiz.server.model.dao.PlayerDAO;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -142,8 +144,9 @@ public class DuelQuizServerMain implements Runnable {
                  questions)*/
 
                 String usr = in.readUTF();
-
-                List<Player> players = (players.isEmpty())
+                
+                List<Player> players = new ArrayList<>();
+                players = (players.isEmpty())
                         ? PlayerDAO.getAvailablePlayers()
                         : PlayerDAO.getUnavailablePlayers();
 
@@ -196,9 +199,17 @@ public class DuelQuizServerMain implements Runnable {
                 user=in.readUTF();
                 adversary=in.readUTF();
                 idDuel=in.readInt();
-                Category c = QuestionController.receivePlayedData(1, out, in,user,adv,idDuel);
+                Category c = QuestionController.receivePlayedData(1, out, in);
                 //Updates the turn to make the adversary the next one to answer
-                DuelDAO.updateTurn(idDuel,adversary);
+                //DuelDAO.updateTurn(idDuel,adversary);
+            case GET_PLAYERS:
+                List<String> playrs = playerController.getPlayers();
+                out.writeInt(playrs.size());
+                for (String p : playrs) {
+                    out.writeUTF(p);
+                }
+                output = true;
+                break;
             default:
                 //the message is not compliant with any other message
                 break;

@@ -14,9 +14,12 @@ import java.sql.SQLException;
  */
 public abstract class AbstractDataBaseDAO {
 
-    private static final String CONN_URL = "jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1";
-    private static final String DBUSER = "martijua";
-    private static final String PASSWD = "martijua";
+    //private static final String CONN_URL = "jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1";
+    //private static final String DBUSER = "martijua";
+    //private static final String PASSWD = "martijua";
+    private static final String CONN_URL = "jdbc:mysql://localhost:3306/duelquiz";
+    private static final String DBUSER = "root";
+    private static final String PASSWD = "mysqlDB";
 
     public static Connection connect() {
         try {
