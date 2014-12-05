@@ -167,7 +167,7 @@ public class LoadBalancerThread extends Thread {
                 out.writeUTF(minCharged.getAddress());
                 out.flush();
                 break;
-
+                
             default:
                 //the message is not compliant with any other message
                 break;

@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 /**
  *
@@ -30,7 +29,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
             ResultSet rs = preStatement.executeQuery();
             if (rs.next()) {
                 ret = rs.getInt(1);
-            }else{
+            } else {
                 throw new SQLException();
             }
 
@@ -43,7 +42,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             rs = statement.executeQuery();
 
-            
+
             statement.close();
             connection.close();
 
@@ -86,5 +85,25 @@ public class DuelDAO extends AbstractDataBaseDAO {
     public static void updateScore(int duelID, int score, int player) {
         //@TODO
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static void updateTurn(int idDuel, String adversary) {
+        Connection connection = connect();
+        try {
+            PreparedStatement statement = connection.prepareStatement("UPDATE DUEL SET TURN = ? WHERE DUELID = ?");
+            statement.setString(1, adversary);
+            statement.setInt(2, idDuel);
+
+            statement.executeQuery();
+
+            statement.close();
+            connection.close();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("User already exists");
+        } catch (SQLException e) {
+            System.out.println("Error");
+            e.printStackTrace();
+        }
     }
 }

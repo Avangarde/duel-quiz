@@ -10,10 +10,14 @@ import duel.quiz.server.controller.TicketController;
 import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.Ticket;
+import duel.quiz.server.model.dao.DuelDAO;
+import duel.quiz.server.model.dao.PlayerDAO;
 
 import java.io.*;
 import java.net.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +36,6 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
-    
     private static PlayerController playerController = new PlayerController();
 
     /**
@@ -100,11 +103,14 @@ public class DuelQuizServerMain implements Runnable {
 
         //Method to treat the incoming messages.
         Boolean output = false;
-
+        String user;
+        String adversary;
+        int idUser;
+        
         switch (message) {
             case "LOGIN":
 
-                String user = in.readUTF(); //Obtain user (from message or protocol)
+                user = in.readUTF(); //Obtain user (from message or protocol)
                 String pass = in.readUTF(); //Obtain pass
                 Player player = PlayerController.loginPlayer(user, pass);
                 if (player != null) {
@@ -133,14 +139,27 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case "RANDOMPLAY":
                 QuestionController.sendNewQuestions(out, in);
-                //@TODO Find an adversary in a new Thread
-                String ad=socket.getInetAddress().toString();
-                Ticket t = server.getTicketByAddres(ad);
-                playerController.findAdversary(t.getPlayer().getUser(),ad,
-                        server.getLoadBalancerAddress());
-                
                 /*@TODO when found, send it to the player (see if after the 
                  questions)*/
+
+                String usr = in.readUTF();
+
+                List<Player> players = (players.isEmpty())
+                        ? PlayerDAO.getAvailablePlayers()
+                        : PlayerDAO.getUnavailablePlayers();
+
+                Player adv = players.get(new Random().nextInt(players.size()));
+                while (adv.getUser().equals(usr)) {
+                    adv = players.get(new Random().nextInt(players.size()));
+                }
+                //Save in the database the duel with the players (create returns the duel's id)
+                int idDuel = DuelDAO.create("En Attente");
+                DuelDAO.linkPlayerToDuel(usr, idDuel);
+                DuelDAO.linkPlayerToDuel(adv.getUser(), idDuel);
+                //Send to the user the adversary and the duel id
+                out.writeUTF(adv.getUser());
+                out.writeInt(idDuel);
+                out.flush();
                 break;
             case "REQUESTCATS":
                 //Transmits all categories
@@ -166,11 +185,12 @@ public class DuelQuizServerMain implements Runnable {
                 output = true;
                 break;
             case SENDING_ROUND_DATA:
-                QuestionController.receivePlayedData(1,out, in);
-                
-                //QuestionController.transmitAdversaryPlayedData(received, out, in);
-                //QuestionController.sendNewQuestions(out, in);
-
+                user=in.readUTF();
+                adversary=in.readUTF();
+                idDuel=in.readInt();
+                Category c = QuestionController.receivePlayedData(1, out, in,user,adv,idDuel);
+                //Updates the turn to make the adversary the next one to answer
+                DuelDAO.updateTurn(idDuel,adversary);
             default:
                 //the message is not compliant with any other message
                 break;
