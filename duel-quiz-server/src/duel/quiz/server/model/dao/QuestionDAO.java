@@ -144,7 +144,7 @@ public class QuestionDAO extends AbstractDataBaseDAO {
         PreparedStatement stmnt;
         try {
             stmnt = connection.prepareStatement(
-                    "SELECT * FROM Question WHERE categoryname = ?");
+                    "SELECT * FROM Question WHERE question = ?");
             stmnt.setString(1, question);
             ResultSet rslt = stmnt.executeQuery();
 
