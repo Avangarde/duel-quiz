@@ -28,7 +28,7 @@ public class DuelQuizClientMain {
 
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    private static Player currentPlayer = null;
+    public static Player currentPlayer = null;
     private static Ticket ticket = null;
 
     /**

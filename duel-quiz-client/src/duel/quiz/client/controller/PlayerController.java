@@ -9,7 +9,7 @@ import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
-import duel.quiz.client.view.ConsoleColors;
+import duel.quiz.client.view.DuelQuizClientMain;
 
 import java.io.*;
 import java.net.Socket;
@@ -164,6 +164,7 @@ public class PlayerController extends AbstractController {
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
             output.writeUTF(RANDOMPLAY);
+            output.writeUTF(DuelQuizClientMain.currentPlayer.getUser());
             output.flush();
 
             //Receive the answers and deal with them
