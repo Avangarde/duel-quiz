@@ -19,24 +19,31 @@ import java.sql.Statement;
 public class DuelDAO extends AbstractDataBaseDAO {
 
     public static int create(String waiting) {
-        
+
         Connection connection = connect();
         int ret = -1;
         try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO Duel "
-                    + "(status, scoreplayer1, scoreplayer2) "
-                    + "Values (?,'0','0')", Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, waiting);
+            //Obtain next value in sequence.
 
-            statement.executeUpdate();
-            
-            ResultSet rs = statement.getGeneratedKeys();
+            PreparedStatement preStatement = connection.prepareStatement("select Seq_Duel.nextval from USER_SEQUENCES");
 
+            ResultSet rs = preStatement.executeQuery();
             if (rs.next()) {
                 ret = rs.getInt(1);
-                System.out.println(rs.getInt(ret));
+            }else{
+                throw new SQLException();
             }
 
+
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO Duel "
+                    + "(duelid, status, scoreplayer1, scoreplayer2) "
+                    + "Values (?,?,'0','0')");
+            statement.setLong(1, ret);
+            statement.setString(2, waiting);
+
+            rs = statement.executeQuery();
+
+            
             statement.close();
             connection.close();
 
@@ -46,7 +53,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return ret;
     }
 
@@ -60,10 +67,10 @@ public class DuelDAO extends AbstractDataBaseDAO {
             statement.setInt(2, duelID);
 
             statement.executeQuery();
-            
+
             statement.close();
             connection.close();
-            
+
             ret = true;
 
         } catch (SQLIntegrityConstraintViolationException e) {
@@ -72,11 +79,11 @@ public class DuelDAO extends AbstractDataBaseDAO {
             System.out.println("Error");
             e.printStackTrace();
         }
-        
+
         return ret;
     }
 
-    public static void updateScore(int duelID) {
+    public static void updateScore(int duelID, int score, int player) {
         //@TODO
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
