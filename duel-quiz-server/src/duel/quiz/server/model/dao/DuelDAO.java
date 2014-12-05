@@ -83,7 +83,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
         return ret;
     }
 
-    public static void updateScore(int duelID) {
+    public static void updateScore(int duelID, int score, int player) {
         //@TODO
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

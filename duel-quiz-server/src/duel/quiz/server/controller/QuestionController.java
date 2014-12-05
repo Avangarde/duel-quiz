@@ -205,6 +205,9 @@ public class QuestionController {
             //User
             String user = in.readUTF();
             
+            //USER ADVERSARY
+            String adversary = in.readUTF();
+            
             //Name
             ret.setName(in.readUTF());
             
@@ -270,8 +273,10 @@ public class QuestionController {
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID());
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID());
             
+            int player = 1;
+            int score = countCorrectAnswers(answersToPersist);
             //Update Duel points
-            DuelDAO.updateScore(duelID);
+            DuelDAO.updateScore(duelID, score, player);
 
             //TODO Persist
             out.writeUTF("Persisted :)");
@@ -284,5 +289,9 @@ public class QuestionController {
 
     public static void transmitAdversaryPlayedData(Category received, DataOutputStream out, DataInputStream in) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static int countCorrectAnswers(List<Answer> answersToPersist) {
+        return 0;
     }
 }
