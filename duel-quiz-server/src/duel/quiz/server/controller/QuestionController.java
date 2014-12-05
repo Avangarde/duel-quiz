@@ -206,7 +206,11 @@ public class QuestionController {
             String user = in.readUTF();
             
             //USER ADVERSARY
-            String adversary = in.readUTF();
+            //String adversary = in.readUTF();
+            
+            //DUEL ID
+            
+            int duelID = in.readInt();
             
             //Name
             ret.setName(in.readUTF());
@@ -256,8 +260,8 @@ public class QuestionController {
             }
             
             //Duel
-            int duelID = DuelDAO.create("WAITING");
-            DuelDAO.linkPlayerToDuel(user,duelID);
+            //int duelID = DuelDAO.create("WAITING");
+            //DuelDAO.linkPlayerToDuel(user,duelID);
             
             //Round
             int roundID = RoundDAO.create(duelID, ret.getName());

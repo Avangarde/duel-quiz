@@ -52,6 +52,13 @@ public class Duel {
         this.duelID = duelID;
         this.status = status;
     }
+
+    public Duel(long duelID, String status, int scorePlayer1, int scorePlayer2) {
+        this.duelID = duelID;
+        this.status = status;
+        this.scorePlayer1 = scorePlayer1;
+        this.scorePlayer2 = scorePlayer2;
+    }
     
     
     
