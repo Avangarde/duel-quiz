@@ -23,20 +23,13 @@ public class RoundDAO extends AbstractDataBaseDAO{
         int ret = -1;
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO Round "
-                    + "(duelid, categoryname) "
-                    + "Values (?,?)", Statement.RETURN_GENERATED_KEYS);
+                    + "(duelid, ,roundid, categoryname) "
+                    + "Values (?,'1',?)");
             statement.setInt(1, duelID);
             statement.setString(2, name);
 
             statement.executeUpdate();
             
-            ResultSet rs = statement.getGeneratedKeys();
-
-            if (rs.next()) {
-                ret = rs.getInt(1);
-                System.out.println(rs.getInt(ret));
-            }
-
             statement.close();
             connection.close();
 

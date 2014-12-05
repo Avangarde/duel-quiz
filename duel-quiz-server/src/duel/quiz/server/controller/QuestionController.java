@@ -258,6 +258,8 @@ public class QuestionController {
             
             //Round
             int roundID = RoundDAO.create(duelID, ret.getName());
+            //Upon creation always first turn
+            roundID = 1;
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(0).getQuestionID());
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(1).getQuestionID());
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(2).getQuestionID());
