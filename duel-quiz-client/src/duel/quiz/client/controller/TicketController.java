@@ -2,6 +2,7 @@ package duel.quiz.client.controller;
 
 import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Ticket;
+import duel.quiz.client.view.DuelQuizClientMain;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -26,6 +27,7 @@ public class TicketController {
     private static final String LOAD_BALANCER_HOST = "224.0.0.1";
     private static final int LOAD_BALANCER_PORT = 4466;
     private static final String GET_SERVER = "GET SERVER";
+    private static final String NO_LOGIN = "";
 
     private static String getLoadBalancerAddress() throws ServerDownException {
         String loadBalancerAddress = null;
@@ -67,6 +69,11 @@ public class TicketController {
 
             //Sending Get Server Message
             output.writeUTF(GET_SERVER);
+            if (DuelQuizClientMain.currentPlayer != null) {
+                output.writeUTF(DuelQuizClientMain.currentPlayer.getUser());
+            } else {
+                output.writeUTF(NO_LOGIN);
+            }
             System.out.print("Getting a new server address...");
             output.flush();
             String address = input.readUTF();
