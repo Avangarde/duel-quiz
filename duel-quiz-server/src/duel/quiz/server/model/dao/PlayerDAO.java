@@ -1,8 +1,12 @@
 package duel.quiz.server.model.dao;
 
 import duel.quiz.server.model.Player;
+import static duel.quiz.server.model.dao.AbstractDataBaseDAO.closeConnection;
+import static duel.quiz.server.model.dao.AbstractDataBaseDAO.connect;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +19,9 @@ import java.util.logging.Logger;
  * @author martijua
  */
 public class PlayerDAO extends AbstractDataBaseDAO {
+    
+    private static final String AVAILABLE = "AVAILABLE";
+    private static final String UNAVAILABLE = "UNAVAILABLE";
 
     public static Player getPlayer(String user, String pass) {
         Player player = null;
@@ -31,7 +38,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             ResultSet result = statement.executeQuery();
 
             if (result.next()) {
-                player = new Player(result.getString("username"), result.getString("password"), result.getString("state"), result.getInt("score"));
+                player = new Player(result.getString("username"), "", result.getString("state"), result.getInt("score"));
             }
             result.close();
             statement.close();
@@ -50,9 +57,9 @@ public class PlayerDAO extends AbstractDataBaseDAO {
     public static boolean setPlayerStatus(String user, boolean isOnline) {
         String status;
         if (isOnline) {
-            status = "AVAILABLE";
+            status = AVAILABLE;
         } else {
-            status = "UNAVAILABLE";
+            status = UNAVAILABLE;
         }
 
 
@@ -98,5 +105,92 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             e.printStackTrace();
         }
         return ret;
+    }
+    
+    public static Player findPlayer(String user) {
+        Player player = null;
+        Connection connection = connect();
+
+
+        PreparedStatement statement;
+        try {
+            statement = connection.prepareStatement(
+                    "SELECT * FROM Player WHERE username = ?");
+            statement.setString(1, user);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                player = new Player(result.getString("username"), "", result.getString("state"), result.getInt("score"));
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+          e.printStackTrace();
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return player;
+    }
+    
+    public static List<Player> getAvailablePlayers() {
+        List<Player> players = new ArrayList<>();
+        Connection connection = connect();
+
+        PreparedStatement statement;
+        try {
+            statement = connection.prepareStatement("SELECT * FROM Player "
+                    + "WHERE state = ?");
+            statement.setString(1, AVAILABLE);
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                players.add(new Player(result.getString("username"), "", result.getString("state"), result.getInt("score")));
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return players;
+    }
+    
+    public static List<Player> getUnavailablePlayers() {
+        List<Player> players = new ArrayList<>();
+        Connection connection = connect();
+
+        PreparedStatement statement;
+        try {
+            statement = connection.prepareStatement("SELECT * FROM Player "
+                    + "WHERE state = ?");
+            statement.setString(1, UNAVAILABLE);
+            ResultSet result = statement.executeQuery();
+
+            while (result.next()) {
+                players.add(new Player(result.getString("username"), "", result.getString("state"), result.getInt("score")));
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return players;
     }
 }

@@ -4,12 +4,18 @@
  */
 package duel.quiz.server.model.dao;
 
+import duel.quiz.server.model.Duel;
 import static duel.quiz.server.model.dao.AbstractDataBaseDAO.connect;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -87,23 +93,35 @@ public class DuelDAO extends AbstractDataBaseDAO {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static void updateTurn(int idDuel, String adversary) {
+    public static List<Duel> getAllNotifications(String user) {
+        List<Duel> duelList = new ArrayList<>();
+
         Connection connection = connect();
+        PreparedStatement statement;
         try {
-            PreparedStatement statement = connection.prepareStatement("UPDATE DUEL SET TURN = ? WHERE DUELID = ?");
-            statement.setString(1, adversary);
-            statement.setInt(2, idDuel);
+            statement = connection.prepareStatement(
+                    "SELECT * FROM Duel "
+                    + "WHERE turn = ?");
+            statement.setString(1, user);
+            ResultSet result = statement.executeQuery();
 
-            statement.executeQuery();
-
+            while (result.next()) {
+                duelList.add(new Duel(result.getLong("duelId"), result.getString("status"), result.getInt("scorePlayer1"), result.getInt("scorePlayer2")));
+            }
+            result.close();
             statement.close();
-            connection.close();
-
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
-        } catch (SQLException e) {
-            System.out.println("Error");
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        return duelList;
+
+
+
     }
 }

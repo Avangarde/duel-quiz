@@ -32,6 +32,7 @@ public class LoadBalancerThread extends Thread {
     private static final String GET_SERVER = "GET SERVER";
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
+    private static final String GET_PLAYERS = "GET PLAYERS";
 
     public LoadBalancerThread(Server server) throws IOException {
         this("FaultDetectorThread", server);
@@ -160,14 +161,14 @@ public class LoadBalancerThread extends Thread {
 
             case GET_SERVER:
                 System.out.println("Selecting server...");
-                Server minCharged = selectServer(socket);
+                String username = in.readUTF();
+                Server minCharged = selectServer(socket, username);
 
                 System.out.println("Sending server address: " + minCharged.getAddress()
                         + " to client " + socket.getInetAddress());
                 out.writeUTF(minCharged.getAddress());
                 out.flush();
                 break;
-                
             default:
                 //the message is not compliant with any other message
                 break;
@@ -184,7 +185,7 @@ public class LoadBalancerThread extends Thread {
         return format.format(date);
     }
 
-    private Server selectServer(Socket socket) {
+    private Server selectServer(Socket socket, String username) {
         Iterator<Server> iterator = server.getServers().iterator();
         Server minCharged = server;
         Socket socketToServer;
@@ -232,6 +233,7 @@ public class LoadBalancerThread extends Thread {
             System.out.println("Adding client " + clientAddress + 
                     " to server : " + minCharged.getAddress());
             output.writeUTF(clientAddress);
+            output.writeUTF(username);
             output.flush();
 
             if (input.readBoolean()) {
