@@ -7,13 +7,14 @@ package duel.quiz.server;
 import duel.quiz.server.controller.QuestionController;
 import duel.quiz.server.controller.PlayerController;
 import duel.quiz.server.controller.TicketController;
-import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.Ticket;
+import duel.quiz.server.model.dao.PlayerDAO;
 
 import java.io.*;
 import java.net.*;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,8 +33,9 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
+    private static final String GET_PLAYERS = "GET PLAYERS";
     
-    private static PlayerController playerController = new PlayerController();
+    private static PlayerController playerController;
 
     /**
      * @param args the command line arguments
@@ -42,8 +44,7 @@ public class DuelQuizServerMain implements Runnable {
     public static void main(String[] args) throws UnknownHostException {
         //Initialize server
         server = new Server();
-        server.init();
-
+        server.init();        
 
         try {
             serverSocket = new ServerSocket(PORT_LISTENER);
@@ -53,6 +54,7 @@ public class DuelQuizServerMain implements Runnable {
 //            Logger.getLogger(DuelQuizServerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
         //@TODO Update the availabilty list (Load at the beginning) (TO DISCUSS !!)
+        playerController = new PlayerController(server);
         Thread thread;
         thread = new Thread(playerController);
         thread.start();
@@ -106,10 +108,8 @@ public class DuelQuizServerMain implements Runnable {
 
                 String user = in.readUTF(); //Obtain user (from message or protocol)
                 String pass = in.readUTF(); //Obtain pass
-                Player player = PlayerController.loginPlayer(user, pass);
+                Player player = playerController.loginPlayer(user, pass);
                 if (player != null) {
-                    server.getTickets().indexOf(in);
-                    socket.getInetAddress();
                     Ticket t = server.getTicketByAddres(socket.getInetAddress().toString());
                     player.setTicket(t);
                     t.setPlayer(player);
@@ -159,9 +159,18 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case ADD_CLIENT:
                 String clientAddress = in.readUTF();
+                System.out.println("Creating ticket...");
                 Ticket ticket = new Ticket();
                 ticket.setClientAddress(clientAddress);
                 ticket.setLastConnexion(new Date());
+                String username = in.readUTF();
+                if (!username.isEmpty()) {
+                    Player playr = PlayerDAO.findPlayer(username);
+                    if (playr != null) {
+                        ticket.setPlayer(playr);                        
+                        PlayerDAO.setPlayerStatus(username, true);
+                    }
+                }
                 server.tickets.add(ticket);
                 output = true;
                 break;
@@ -170,7 +179,15 @@ public class DuelQuizServerMain implements Runnable {
                 
                 //QuestionController.transmitAdversaryPlayedData(received, out, in);
                 //QuestionController.sendNewQuestions(out, in);
-
+                break;
+            case GET_PLAYERS:
+                List<String> players = playerController.getPlayers();
+                out.writeInt(players.size());
+                for (String p : players) {
+                    out.writeUTF(p);
+                }
+                output = true;
+                break;
             default:
                 //the message is not compliant with any other message
                 break;

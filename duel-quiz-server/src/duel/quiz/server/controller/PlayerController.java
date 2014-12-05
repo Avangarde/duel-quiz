@@ -5,6 +5,7 @@
  */
 package duel.quiz.server.controller;
 
+import duel.quiz.server.Server;
 import duel.quiz.server.model.Player;
 import duel.quiz.server.model.Ticket;
 import duel.quiz.server.model.dao.PlayerDAO;
@@ -14,11 +15,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,11 @@ public class PlayerController implements Runnable {
     private static final int LOAD_BALANCER_PORT = 4466;
     private static final int TIME_OUT = 60000;
     private static final String FIND_ADVERSARY="FIND_ADVERSARY";
-    private static final HashMap<String, Long> availablePlayers = new HashMap<>();
+    private Server server;
+    
+    public PlayerController(Server server) {
+        this.server = server;
+    }
 
     /**
      * Logs a player and put his name in the availability list
@@ -44,12 +49,13 @@ public class PlayerController implements Runnable {
      * @param pass
      * @return
      */
-    public static Player loginPlayer(String user, String pass) {
+    public Player loginPlayer(String user, String pass) {
         Player player;
-        player = PlayerDAO.getPlayer(user, pass);
-        PlayerDAO.setPlayerStatus(user, true);
+        player = PlayerDAO.getPlayer(user, pass);        
         if (player != null) {
-            availablePlayers.put(user, System.currentTimeMillis());
+            PlayerDAO.setPlayerStatus(user, true);
+        } else {
+            PlayerDAO.setPlayerStatus(user, false);
         }
         return player;
     }
@@ -78,20 +84,22 @@ public class PlayerController implements Runnable {
      * Reads the list of available players and if he is not connected then
      * change his status
      */
-    public static void removePlayersUnavailables() {
+    public void removePlayersUnavailables() {
         long actualTime = System.currentTimeMillis();
-        String player;
-        for (Entry<String, Long> av : availablePlayers.entrySet()) {
-            if ((actualTime - av.getValue()) / 1000
-                    > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
-                player = av.getKey();
-                PlayerDAO.setPlayerStatus(player, false);
-                availablePlayers.remove(player);
-                System.out.println("Removed player " + player);
+        for (Iterator<Ticket> iterator = server.getTickets().iterator(); iterator.hasNext();) {
+            Ticket ticket = iterator.next();        
+            if ((actualTime - ticket.getLastConnexion().getTime()) / 1000
+                    > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {                
+                if (ticket.getPlayer() != null) {
+                    PlayerDAO.setPlayerStatus(ticket.getPlayer().getUser(), false);
+                }
+                server.getTickets().remove(ticket);
+                
+                System.out.println("Removed player " + ticket);
                 //@TODO Update #players and send it to the LB
             }
         }
-    }
+    }    
     
     /**
      * Finds an adversary to the specified client.
@@ -123,6 +131,29 @@ public class PlayerController implements Runnable {
         }
     }
     
+    /**
+     * Get 10 players (maximun). Look for available players first.
+     * @return 
+     */
+    public List<String> getPlayers() {
+        List<String> players = new ArrayList<>();
+        
+        List<Player> availablePlayers = PlayerDAO.getAvailablePlayers();
+        for (Player player : availablePlayers) {
+            players.add(player.getUser());
+        }
+        
+        if (availablePlayers.size() < 10) {
+            List<Player> unavailablePlayers;
+            unavailablePlayers = PlayerDAO.getUnavailablePlayers();
+            for (int i = 0; i < 10 - availablePlayers.size() && i < unavailablePlayers.size(); i++) {
+                players.add(unavailablePlayers.get(i).getUser());
+            }
+        }
+        
+        return players;
+    }
+    
     @Override
     public void run() {
         while (true) {
@@ -133,5 +164,5 @@ public class PlayerController implements Runnable {
                 Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
+    } 
 }

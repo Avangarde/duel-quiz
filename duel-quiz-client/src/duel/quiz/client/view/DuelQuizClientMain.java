@@ -28,7 +28,7 @@ public class DuelQuizClientMain {
 
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private static final String cls = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    private static Player currentPlayer = null;
+    public static Player currentPlayer = null;
     private static Ticket ticket = null;
 
     /**
@@ -282,7 +282,7 @@ public class DuelQuizClientMain {
             System.out.println("What do you want to do?");
 
             System.out.println("1. New random player");
-            System.out.println("2. Challenge a friend");
+            System.out.println("2. Challenge a player");
             System.out.println("3. Go Back\n");
 
             option = readInteger();
@@ -293,10 +293,11 @@ public class DuelQuizClientMain {
                     randomChallenge();
                     break;
                 case 2:
-                    System.out.println("Challenge a friend");
-                    displayListPlayers();
-                    System.out.println("Enter name of player");
-                    String player = readString();
+                    System.out.println("Challenge a player");
+                    String player;
+
+                    player = pickPlayer();
+
                     if (player != null) {
                         challengePlayer(player);
                     } else {
@@ -354,13 +355,41 @@ public class DuelQuizClientMain {
         new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser());
 
     }
-    //@TODO Server must request to the clients until someone accepts
-    //@TODO set in the local BD the status of the match (random Player - En attente)
-    //@TODO when in the server side someone accepts, update the local BD with the name and the score
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
-    private static void displayListPlayers() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    /**
+     * Get a player list from server and user pick one
+     *
+     * @return player selected
+     * @throws ServerDownException
+     */
+    private static String pickPlayer() {
+        try {
+            ticket = TicketController.validateTicket(ticket);
+
+            PlayerController playerController = new PlayerController(ticket.getServerAddress());
+            List<String> playerList = playerController.fetchPlayerList();
+
+            int option = -1;
+            String oponent = null;
+            while (option < 1 || option > playerList.size()) {
+                System.out.println("Choose a player to challenge: \n");
+                for (int i = 0; i < playerList.size(); i++) {
+                    System.out.println((i + 1) + ". " + playerList.get(i));
+                }
+
+                option = readInteger();
+                if (option > 0 && option <= playerList.size()) {
+                    oponent = playerList.get(option);
+
+                } else {
+                    System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a player" + ConsoleColors.ANSI_RESET);
+                }
+            }
+            return oponent;
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            return pickPlayer();
+        }
     }
 
     private static void suggestQuestion() {
@@ -484,7 +513,7 @@ public class DuelQuizClientMain {
             option = readInteger();
 
             if (option > 0 && option < 4) {
-                ret = round.get(option-1);
+                ret = round.get(option - 1);
             } else {
                 System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a category" + ConsoleColors.ANSI_RESET);
             }
@@ -492,7 +521,6 @@ public class DuelQuizClientMain {
         return ret;
     }
 
-    
     private static void answerAllQuestions(Category categorySelected) {
         //@TODO answer the questions and send them to the Server
         System.out.println("First Question in " + categorySelected.getName() + ":\n");

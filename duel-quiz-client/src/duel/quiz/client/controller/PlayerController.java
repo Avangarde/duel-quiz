@@ -9,7 +9,7 @@ import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
-import duel.quiz.client.view.ConsoleColors;
+import duel.quiz.client.view.DuelQuizClientMain;
 
 import java.io.*;
 import java.net.Socket;
@@ -29,7 +29,8 @@ public class PlayerController extends AbstractController {
     private static final String SIGNUP_SMS = "REGISTER";
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
-    private final int TIME_OUT = 5000;
+    private static final String GET_PLAYERS = "GET PLAYERS";    
+    private final int TIME_OUT = 300000;
 
     public PlayerController(String host) {
         this.HOST = host;
@@ -115,38 +116,38 @@ public class PlayerController extends AbstractController {
      * @return
      */
     public List<String> fetchPlayerList() {
-//        Socket skClient;
-//        DataInputStream input;
-//        DataOutputStream output;
-//        List<String> listPlayers = new ArrayList<String>();
-//        try {
-//            skClient = new Socket(HOST, PORT);
-//            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
-//            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
-//
-//
-//            //Sending request for categories
-//            output.writeUTF(RANDOMPLAY);
-//            output.flush();
-//
-//            String dataSent = input.readUTF();
-//
-//
-//            while (dataSent == null ? NO_MORE_PLAYERS != null : !dataSent.equals(NO_MORE_PLAYERS)) {
-//                listPlayers.add(dataSent);
-//                dataSent = input.readUTF();
-//            }
-//            skClient.close();
-//        } catch (UnknownHostException ex) {
-////            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-//            System.out.println("Unknown Host");
-//        } catch (IOException ex) {
-////            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-//            System.out.println("IO Exception");
-//        }
-//        //Empty if something went wrong
-//        return listPlayers;
-        return null;
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        List<String> listPlayers = new ArrayList<>();
+        try {
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+
+            //Sending request for players
+            output.writeUTF(GET_PLAYERS);
+            output.flush();
+
+            int numPlayers = input.readInt();
+            for (int i=0; i < numPlayers; i++) {
+                String player = input.readUTF();
+                if (!player.equals(DuelQuizClientMain.currentPlayer.getUser())) {
+                    listPlayers.add(player);
+                }                
+            }
+            input.readBoolean();
+            skClient.close();
+        } catch (UnknownHostException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (IOException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IO Exception");
+        }
+        //Empty if something went wrong
+        return listPlayers;
     }
 
     /**
