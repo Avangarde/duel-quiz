@@ -54,6 +54,7 @@ create table DUEL
    STATUS               varchar(20) not null,
    SCOREPLAYER1         int not null,
    SCOREPLAYER2         int,
+   ACTIVEUSER		varchar(20) not null,
    primary key (DUELID)
 );
 
@@ -107,6 +108,8 @@ create table ROUND
 (
    DUELID               int not null,
    ROUNDID              int not null,
+   P1HASPLAYED          bool not null,
+   P2HASPLAYED          bool not null,
    CATEGORYNAME         varchar(40) not null,
    primary key (DUELID, ROUNDID)
 );
@@ -151,4 +154,6 @@ alter table ROUNDQUESTION add constraint FK_USES foreign key (DUELID, ROUNDID)
 
 alter table ROUNDQUESTION add constraint FK_USES2 foreign key (QUESTIONID)
       references QUESTION (QUESTIONID) on delete restrict on update restrict;
-
+	  
+alter table DUEL add constraint FK_ACTIVEUSER foreign key (ACTIVEUSER) 
+	  references PLAYER (USERNAME) on delete restrict on update restrict;

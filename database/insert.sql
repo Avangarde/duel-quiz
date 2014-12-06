@@ -106,11 +106,11 @@ Insert into PLAYER (USERNAME,PASSWORD,STATE,SCORE) values ('Earojas','1234','UNA
 Insert into PLAYER (USERNAME,PASSWORD,STATE,SCORE) values ('user20','pass20','UNAVAILABLE','0');
 Insert into PLAYER (USERNAME,PASSWORD,STATE,SCORE) values ('User21','Pass21','UNAVAILABLE','0');
 
-Insert into DUEL (DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2) values ('1','WAITING','1','0');
+Insert into DUEL (DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,ACTIVEUSER) values ('1','WAITING','1','0','Jmmr');
 
 Insert into PLAYERDUEL (USERNAME,DUELID) values ('sergio','1');
 
-Insert into ROUND (DUELID,ROUNDID,CATEGORYNAME) values ('1','1','Art et culture');
+Insert into ROUND (DUELID,ROUNDID,P1HASPLAYED,P2HASPLAYED,CATEGORYNAME) values ('1','1','0','0','Art et culture');
 
 Insert into ROUNDQUESTION (DUELID,ROUNDID,QUESTIONID) values ('1','1','2');
 Insert into ROUNDQUESTION (DUELID,ROUNDID,QUESTIONID) values ('1','1','3');
