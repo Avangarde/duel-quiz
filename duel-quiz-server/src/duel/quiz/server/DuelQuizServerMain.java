@@ -155,7 +155,7 @@ public class DuelQuizServerMain implements Runnable {
                     adv = players.get(new Random().nextInt(players.size()));
                 }
                 //Save in the database the duel with the players (create returns the duel's id)
-                int idDuel = DuelDAO.create("En Attente");
+                int idDuel = DuelDAO.create("En Attente",usr);
                 DuelDAO.linkPlayerToDuel(usr, idDuel);
                 DuelDAO.linkPlayerToDuel(adv.getUser(), idDuel);
                 //Send to the user the adversary and the duel id

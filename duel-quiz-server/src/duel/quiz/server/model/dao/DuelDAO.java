@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class DuelDAO extends AbstractDataBaseDAO {
 
-    public static int create(String waiting) {
+    public static int create(String waiting,String activeUser) {
 
         Connection connection = connect();
         int ret = -1;
@@ -40,11 +40,13 @@ public class DuelDAO extends AbstractDataBaseDAO {
             }
 
 
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO Duel "
-                    + "(duelid, status, scoreplayer1, scoreplayer2) "
-                    + "Values (?,?,'0','0')");
+            PreparedStatement statement = connection.prepareStatement(
+                    "Insert into DUEL "
+                            + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,ACTIVEUSER) "
+                            + "values (?,?,'1','0',?)");
             statement.setLong(1, ret);
             statement.setString(2, waiting);
+            statement.setString(3, activeUser);
 
             rs = statement.executeQuery();
 
@@ -89,7 +91,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
     }
 
     public static void updateScore(int duelID, int score, int player) {
-        //@TODO
+        //@TODO don't forget to add the p1hasplayed and p2hasplayed int the db
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

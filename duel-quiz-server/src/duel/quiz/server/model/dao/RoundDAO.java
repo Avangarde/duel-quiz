@@ -22,9 +22,10 @@ public class RoundDAO extends AbstractDataBaseDAO{
         Connection connection = connect();
         int ret = -1;
         try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO Round "
-                    + "(duelid, ,roundid, categoryname) "
-                    + "Values (?,'1',?)");
+            PreparedStatement statement = connection.prepareStatement(
+                    "Insert into ROUND "
+                            + "(DUELID,ROUNDID,P1HASPLAYED,P2HASPLAYED,CATEGORYNAME) "
+                            + "values (?,'1','1','0',?)");
             statement.setInt(1, duelID);
             statement.setString(2, name);
 
