@@ -40,8 +40,9 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_PLAYERS = "GET PLAYERS";
     private static final String GET_DUELS = "GET DUELS";
     private static final String GET_QUESTIONS = "GET QUESTIONS";
+    private static final String GET_NOTIFICATION_SIZE = "GETNOTSIZE";
+    private static final String GET_NOTIFICATIONS = "GETNOTIFICATIONS";
     private static final String WAITING = "En Attente";
-    
     private static PlayerController playerController;
 
     /**
@@ -227,7 +228,14 @@ public class DuelQuizServerMain implements Runnable {
                 user = in.readUTF();
                 playerController.getPlayerGames(user, out, in);
                 break;
+            case GET_NOTIFICATIONS:
+                user = in.readUTF();
+                playerController.getNotifications(user, out, in);
+                break;
 
+            case GET_NOTIFICATION_SIZE:
+                user = in.readUTF();
+                playerController.getNotificationNumber(user, out, in);
                 break;
             case GET_QUESTIONS:
                 QuestionController.sendNewQuestions(out, in);
@@ -237,7 +245,7 @@ public class DuelQuizServerMain implements Runnable {
                 break;
         }
         return output;
-    }    
+    }
 
     @Override
     public void run() {
