@@ -10,6 +10,7 @@ import duel.quiz.client.controller.TicketController;
 import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
+import duel.quiz.client.model.Duel;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
 import duel.quiz.client.model.Ticket;
@@ -249,14 +250,41 @@ public class DuelQuizClientMain {
     private static void displayCurrentGames() {
         System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Current Games *****  *****  ****");
         Integer option = 0;
-        List<String> games = fetchCurrentGames();
+        List<Duel> games = fetchCurrentGames();
+        //For each game, depending on its conditions display a different action.
+        //If the game is ENDED display in gray, its score displayed :)
+        //If the game is RUNNING but it's not the players turn is displayed on green
+        //If the game is in WAITING but is not your turn, is displayed on green also
+
+        //If the game is RUNNING and it is the players turn is displayed on red.
+        //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
+
         int exit = games.size() + 1;
         while (option != exit) {
             System.out.println("What do you want to do?");
 
             int currentIndex = 1;
-            for (String each : games) {
-                System.out.println(currentIndex + ", Play against " + each);
+            for (Duel each : games) {
+                System.out.println(currentIndex + ", Play against " + each.getAdversary()
+                        + " ( " + each.getPlayer1() + " " + each.getScorePlayer1() + " - "
+                        + each.getPlayer2() + " " + each.getScorePlayer2() + ")");
+                if (each.getStatus().equals(PlayerController.ENDED)) {
+                    System.out.println(ConsoleColors.ANSI_PURPLE + "Ended" + ConsoleColors.ANSI_RESET);
+                }
+                if (each.getStatus().equals(PlayerController.RUNNING)) {
+                    if (each.getTurn().equals(each.getAdversary())) {
+                        System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary" + ConsoleColors.ANSI_RESET);
+                    } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                        System.out.println(ConsoleColors.ANSI_RED + "It's your turn" + ConsoleColors.ANSI_RESET);
+                    }
+                }
+                if (each.getStatus().equals(PlayerController.WAITING)) {
+                    if (each.getTurn().equals(each.getAdversary())) {
+                        System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary to accept" + ConsoleColors.ANSI_RESET);
+                    } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                        System.out.println(ConsoleColors.ANSI_RED + "Accept the challenge to play" + ConsoleColors.ANSI_RESET);
+                    }
+                }
                 currentIndex++;
             }
 
@@ -310,13 +338,14 @@ public class DuelQuizClientMain {
         }
     }
 
-    private static List<String> fetchCurrentGames() {
+    private static List<Duel> fetchCurrentGames() {
 
-        //TODO fetch actual gamers
-        List<String> games = new ArrayList<String>();
-        games.add("Sergio");
-        games.add("Juan");
-        games.add("Edward");
+        //TODO fetch actual gamers, this players are sorted in a particular form
+        List<Duel> games = new ArrayList<Duel>();
+        games = PlayerController.getPlayerGames(currentPlayer.getUser());
+
+
+
         return games;
     }
 
@@ -324,8 +353,36 @@ public class DuelQuizClientMain {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private static void continueAgainstPlayer(String get) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static void continueAgainstPlayer(Duel each) {
+        if (each.getStatus().equals(PlayerController.ENDED)) {
+            System.out.println("You can't play a finished match");
+        }
+        if (each.getStatus().equals(PlayerController.RUNNING)) {
+            if (each.getTurn().equals(each.getAdversary())) {
+                System.out.println("Wait for your adversary to play");
+            } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                System.out.println("You chose to battle " + each.getAdversary());
+                PlayerController.continueDuel(each.getDuelID());
+            }
+        }
+        if (each.getStatus().equals(PlayerController.WAITING)) {
+            if (each.getTurn().equals(each.getAdversary())) {
+                System.out.println("Wait for your adversary to play");
+            } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                System.out.println("Do you accept " + each.getAdversary() + "\'s Challenge?");
+                System.out.println("1. Yes\n2. No");
+                int input = readInteger();
+                if (input == 1) {
+                    System.out.println("You accepted the challenge");
+                    PlayerController.continueDuel(each.getDuelID());
+
+                } else {
+                    System.out.println("You refused the challenge");
+
+                }
+
+            }
+        }
     }
 
     private static List<String> fetchNotifications() {

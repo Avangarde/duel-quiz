@@ -7,6 +7,7 @@ package duel.quiz.client.controller;
 import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
+import duel.quiz.client.model.Duel;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
 import duel.quiz.client.view.DuelQuizClientMain;
@@ -29,7 +30,20 @@ public class PlayerController extends AbstractController {
     private static final String SIGNUP_SMS = "REGISTER";
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
-    private static final String GET_PLAYERS = "GET PLAYERS";    
+    private static final String GET_PLAYERS = "GET PLAYERS";
+    //Values for duel status
+    public static String ENDED = "Fini";
+    public static String RUNNING = "En cours";
+    public static String WAITING = "En attente";
+
+
+    public static List<Duel> getPlayerGames(String user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static void continueDuel(long duelID) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     private final int TIME_OUT = 300000;
 
     public PlayerController(String host) {
