@@ -257,6 +257,7 @@ public class QuestionController {
                 if (round.isP1HasPlayed() && !round.isP2HasPlayed()) {
                     //If only one, update the other 
                     RoundDAO.updateP2(duelID,roundID);
+                    DuelDAO.updateActivePlayer(adversary, duelID);
                 } else {
                     //If last round, then game over
                     if (round.getDuel().getDuelID() == 6) {
@@ -275,9 +276,9 @@ public class QuestionController {
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(2).getQuestionID());
 
             //Add Player Answers
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID());
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID());
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID());
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID(),duelID,roundID);
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID(),duelID,roundID);
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID(),duelID,roundID);
 
             int player = 1;
             int score = countCorrectAnswers(answersToPersist);

@@ -39,7 +39,7 @@ public class RoundDAO extends AbstractDataBaseDAO {
             connection.close();
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
+            System.out.println("Round already exists");
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class RoundDAO extends AbstractDataBaseDAO {
             ret = true;
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
+            System.out.println("The Round in the questions already exists");
         } catch (SQLException e) {
             System.out.println("Error");
             e.printStackTrace();

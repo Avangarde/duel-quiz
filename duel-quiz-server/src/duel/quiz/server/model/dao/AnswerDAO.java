@@ -66,14 +66,16 @@ public class AnswerDAO extends AbstractDataBaseDAO {
         return retQuestions;
     }
 
-    public static boolean linkPlayerToAnswer(String user, long answerID) {
+    public static boolean linkPlayerToAnswer(String user, int answerID, int duelID, int roundID) {
         Connection connection = connect();
         boolean ret = false;
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerAnswer "
-                    + "Values (?,?)");
+                    + "Values (?,?,?,?)");
             statement.setString(1, user);
             statement.setLong(2, answerID);
+            statement.setLong(3, duelID);
+            statement.setLong(4, roundID);
 
             statement.executeUpdate();
 
@@ -81,9 +83,8 @@ public class AnswerDAO extends AbstractDataBaseDAO {
             connection.close();
 
             ret = true;
-
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
+            System.out.println("Cannot link the player to the answer");
         } catch (SQLException e) {
             System.out.println("Error");
             e.printStackTrace();
@@ -92,8 +93,8 @@ public class AnswerDAO extends AbstractDataBaseDAO {
         return ret;
     }
 
-    public static long getByString(String answer) {
-        long ret = -1;
+    public static int getByString(String answer) {
+        int ret = -1;
         Connection connection = connect();
         PreparedStatement stmnt;
         try {
@@ -103,7 +104,7 @@ public class AnswerDAO extends AbstractDataBaseDAO {
             ResultSet rslt = stmnt.executeQuery();
 
             if (rslt.next()) {
-                ret = rslt.getLong("answerid");
+                ret = rslt.getInt("answerid");
             }
             rslt.close();
             stmnt.close();
