@@ -14,6 +14,7 @@ import duel.quiz.client.model.Question;
 import duel.quiz.client.view.DuelQuizClientMain;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -32,7 +33,8 @@ public class PlayerController extends AbstractController {
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
     private static final String GET_PLAYERS = "GET PLAYERS";
-    private static final String GET_DUELS = "GET DUELS";
+    private static final String CHALLENGE = "CHALLENGE";
+    
     //Values for duel status
     public static String ENDED = "Fini";
     public static String RUNNING = "En cours";
@@ -134,7 +136,7 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException | ConnectException ex) {
             //@TODO Server fault 
             throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
@@ -150,7 +152,7 @@ public class PlayerController extends AbstractController {
      * @param player
      * @return
      */
-    public boolean signUp(Player player) {
+    public boolean signUp(Player player) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -158,6 +160,7 @@ public class PlayerController extends AbstractController {
         try {
             //@TODO: deal with java.net.ConnectException
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -169,12 +172,12 @@ public class PlayerController extends AbstractController {
 
             logged = input.readBoolean();
             skClient.close();
-        } catch (UnknownHostException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         return logged;
     }
@@ -184,13 +187,14 @@ public class PlayerController extends AbstractController {
      *
      * @return
      */
-    public List<String> fetchPlayerList() {
+    public List<String> fetchPlayerList() throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         List<String> listPlayers = new ArrayList<>();
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -208,12 +212,12 @@ public class PlayerController extends AbstractController {
             }
             input.readBoolean();
             skClient.close();
-        } catch (UnknownHostException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         //Empty if something went wrong
         return listPlayers;
@@ -230,6 +234,7 @@ public class PlayerController extends AbstractController {
         DataOutputStream output;
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -265,13 +270,13 @@ public class PlayerController extends AbstractController {
 
 
 
-        } catch (UnknownHostException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
-        } finally {
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
+        }finally{
             return ret;
         }
     }
@@ -284,6 +289,33 @@ public class PlayerController extends AbstractController {
                 Answer answer = new Answer(input.readLong(), input.readUTF(), input.readBoolean(), question);
                 question.getAnswers().add(answer);
             }
+        }
+    }
+    
+    public void challengePlayer(String player, String opponent) throws ServerDownException {
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        try {
+            //@TODO: deal with java.net.ConnectException
+            skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            output.writeUTF(CHALLENGE);
+            output.writeUTF(player);
+            output.writeUTF(opponent);
+            output.flush();
+            
+            input.readBoolean();
+            skClient.close();
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
+        } catch (IOException ex) {
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
     }
 }

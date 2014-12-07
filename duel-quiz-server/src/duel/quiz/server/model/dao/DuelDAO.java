@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class DuelDAO extends AbstractDataBaseDAO {
 
-    public static int create(String waiting,String activeUser) {
+    public static int create(String status, String activeUser) {
 
         Connection connection = connect();
         int ret = -1;
@@ -42,13 +41,13 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             PreparedStatement statement = connection.prepareStatement(
                     "Insert into DUEL "
-                            + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,ACTIVEUSER) "
+                            + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,TURN) "
                             + "values (?,?,'1','0',?)");
             statement.setLong(1, ret);
-            statement.setString(2, waiting);
+            statement.setString(2, status);
             statement.setString(3, activeUser);
 
-            rs = statement.executeQuery();
+            int res = statement.executeUpdate();
 
 
             statement.close();
@@ -63,7 +62,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
         return ret;
     }
-
+    
     public static boolean linkPlayerToDuel(String user, int duelID) {
         Connection connection = connect();
         boolean ret = false;
@@ -73,7 +72,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
             statement.setString(1, user);
             statement.setInt(2, duelID);
 
-            statement.executeQuery();
+            statement.executeUpdate();
 
             statement.close();
             connection.close();
@@ -81,7 +80,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
             ret = true;
 
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
+            System.out.println("Constraint Violation: " + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Error");
             e.printStackTrace();
