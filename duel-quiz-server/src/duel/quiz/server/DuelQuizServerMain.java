@@ -95,14 +95,14 @@ public class DuelQuizServerMain implements Runnable {
         //Receiving protocol message from client/first handshake
         String message = in.readUTF();
         //Business logic
-        Boolean response = treatMessage(out, in, message);
+        Boolean response = treatMessage(out, in, message, socket);
         //Response
         out.writeBoolean(response);
         out.flush();
         return socket;
     }
 
-    private static Boolean treatMessage(DataOutputStream out, DataInputStream in, String message) throws IOException {
+    private static Boolean treatMessage(DataOutputStream out, DataInputStream in, String message, Socket socket) throws IOException {
 
         //Method to treat the incoming messages.
         Boolean output = false;
@@ -136,7 +136,15 @@ public class DuelQuizServerMain implements Runnable {
                 break;
 
             case "CHALLENGE":
-                String userChallenged = in.readUTF();
+                String challenger = in.readUTF();
+                String challenged = in.readUTF();
+                //Save in the database the duel with the players (create returns the duel's id)
+                int duelId = DuelDAO.create("En Attente",challenger);
+                DuelDAO.linkPlayerToDuel(challenger, duelId);
+                DuelDAO.linkPlayerToDuel(challenged, duelId);
+                
+                output = true;
+                
                 break;
             case "RANDOMPLAY":
                 QuestionController.sendNewQuestions(out, in);

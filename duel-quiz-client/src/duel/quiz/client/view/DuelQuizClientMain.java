@@ -311,7 +311,7 @@ public class DuelQuizClientMain {
 
             System.out.println("1. New random player");
             System.out.println("2. Challenge a player");
-            System.out.println("3. Go Back\n");
+            System.out.println("3. Return to Game Room\n");
 
             option = readInteger();
 
@@ -333,6 +333,7 @@ public class DuelQuizClientMain {
                     }
                     break;
                 case 3:
+                    gameRoomMenu();
                     break;
             }
         }
@@ -349,8 +350,21 @@ public class DuelQuizClientMain {
         return games;
     }
 
-    private static void challengePlayer(String get) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static void challengePlayer(String opponent) {
+        try {
+            ticket = TicketController.validateTicket(ticket);
+
+            PlayerController playerController = new PlayerController(ticket.getServerAddress());
+            playerController.challengePlayer(currentPlayer.getUser(), opponent);
+            System.out.println("You must wait until player " + opponent 
+                    + " accepts the challenge...");
+            Thread.sleep(1000);
+            gameRoomMenu();
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            challengePlayer(opponent);
+        } catch (InterruptedException ex) {            
+        }
     }
 
     private static void continueAgainstPlayer(Duel each) {
@@ -436,7 +450,7 @@ public class DuelQuizClientMain {
 
                 option = readInteger();
                 if (option > 0 && option <= playerList.size()) {
-                    oponent = playerList.get(option);
+                    oponent = playerList.get(option+1);
 
                 } else {
                     System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a player" + ConsoleColors.ANSI_RESET);
