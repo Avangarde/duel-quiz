@@ -15,6 +15,16 @@ public class Duel {
     //How to determine which one is which
     private int scorePlayer1;
     private int scorePlayer2;
+    
+    private String turn;
+
+    public String getTurn() {
+        return turn;
+    }
+
+    public void setTurn(String turn) {
+        this.turn = turn;
+    }
 
     public long getDuelID() {
         return duelID;
