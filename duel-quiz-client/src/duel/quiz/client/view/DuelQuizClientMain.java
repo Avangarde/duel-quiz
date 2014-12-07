@@ -264,9 +264,9 @@ public class DuelQuizClientMain {
 
             int currentIndex = 1;
             for (Duel each : games) {
-                System.out.println(currentIndex + ", Play against " + each.getAdversary()
+                System.out.print(currentIndex + ", Play against " + each.getAdversary()
                         + " ( " + each.getPlayer1() + " " + each.getScorePlayer1() + " - "
-                        + each.getPlayer2() + " " + each.getScorePlayer2() + ")");
+                        + each.getPlayer2() + " " + each.getScorePlayer2() + ") - ");
                 if (each.getStatus().equals(PlayerController.ENDED)) {
                     System.out.println(ConsoleColors.ANSI_PURPLE + "Ended" + ConsoleColors.ANSI_RESET);
                 }
@@ -370,24 +370,25 @@ public class DuelQuizClientMain {
         }
         if (each.getStatus().equals(PlayerController.RUNNING)) {
             if (each.getTurn().equals(each.getAdversary())) {
-                System.out.println("Wait for your adversary to play");
+                System.out.println(cls + ConsoleColors.ANSI_RED + "Wait for your adversary to play\n" + ConsoleColors.ANSI_RESET);
             } else if (each.getTurn().equals(currentPlayer.getUser())) {
-                System.out.println("You chose to battle " + each.getAdversary());
-                continueDuel(each.getDuelID(), each.getAdversary());
+                System.out.println(cls + ConsoleColors.ANSI_GREEN +  "You chose to battle " + each.getAdversary() + ConsoleColors.ANSI_GREEN);
+                continueDuel(each);
             }
         }
+
         if (each.getStatus().equals(PlayerController.WAITING)) {
             if (each.getTurn().equals(each.getAdversary())) {
-                System.out.println("Wait for your adversary to play");
+                System.out.println(cls + ConsoleColors.ANSI_RED + "Wait for your adversary to play\n" + ConsoleColors.ANSI_RESET);
             } else if (each.getTurn().equals(currentPlayer.getUser())) {
                 System.out.println("Do you accept " + each.getAdversary() + "\'s Challenge?");
                 System.out.println("1. Yes\n2. No");
                 int input = readInteger();
                 if (input == 1) {
-                    System.out.println("You accepted the challenge");
-                    continueDuel(each.getDuelID(), each.getAdversary());
+                    System.out.println(cls + ConsoleColors.ANSI_GREEN + "You accepted the challenge\n" + ConsoleColors.ANSI_RESET);
+                    continueDuel(each);
                 } else {
-                    System.out.println("You refused the challenge");
+                    System.out.println(cls + ConsoleColors.ANSI_PURPLE + "You refused the challenge\n" + ConsoleColors.ANSI_PURPLE);
                 }
             }
         }
@@ -596,7 +597,7 @@ public class DuelQuizClientMain {
         answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
     }
 
-    private static void continueDuel(long duelID, String adversary) {
+    private static void continueDuel(Duel duel) {
         try {
             ticket = TicketController.validateTicket(ticket);
 

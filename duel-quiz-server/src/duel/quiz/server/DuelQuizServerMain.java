@@ -40,7 +40,7 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_PLAYERS = "GET PLAYERS";
     private static final String GET_DUELS = "GET DUELS";
     private static final String GET_QUESTIONS = "GET QUESTIONS";
-
+    private static final String WAITING = "En Attente";
     
     private static PlayerController playerController;
 
@@ -142,7 +142,7 @@ public class DuelQuizServerMain implements Runnable {
                 String challenger = in.readUTF();
                 String challenged = in.readUTF();
                 //Save in the database the duel with the players (create returns the duel's id)
-                int duelId = DuelDAO.create("En Attente",challenger);
+                int duelId = DuelDAO.create(WAITING, challenged);
                 DuelDAO.linkPlayerToDuel(challenger, duelId);
                 DuelDAO.linkPlayerToDuel(challenged, duelId);
                 
@@ -234,7 +234,7 @@ public class DuelQuizServerMain implements Runnable {
                 break;
         }
         return output;
-    }
+    }    
 
     @Override
     public void run() {

@@ -40,7 +40,7 @@ public class PlayerController extends AbstractController {
     //Values for duel status
     public static final String ENDED = "Fini";
     public static final String RUNNING = "En cours";
-    public static final String WAITING = "En attente";
+    public static final String WAITING = "En Attente";
 
     public List<Duel> getPlayerGames(String user) {
         //Create an array
