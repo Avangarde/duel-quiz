@@ -38,6 +38,8 @@ public class DuelQuizServerMain implements Runnable {
     private static final String ADD_CLIENT = "ADD CLIENT";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
     private static final String GET_PLAYERS = "GET PLAYERS";
+        private static final String GET_DUELS = "GET DUELS";
+
     
     private static PlayerController playerController;
 
@@ -210,6 +212,11 @@ public class DuelQuizServerMain implements Runnable {
                 }
                 output = true;
                 break;
+            case GET_DUELS:
+                 user=in.readUTF();
+                playerController.getPlayerGames(user, out, in);
+
+                
             default:
                 //the message is not compliant with any other message
                 break;

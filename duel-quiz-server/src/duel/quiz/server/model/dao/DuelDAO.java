@@ -126,4 +126,8 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
 
     }
+
+    public static List<Duel> getAllDuels(String user) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
