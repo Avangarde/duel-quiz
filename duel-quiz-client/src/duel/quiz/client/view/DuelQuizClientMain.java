@@ -450,7 +450,7 @@ public class DuelQuizClientMain {
 
                 option = readInteger();
                 if (option > 0 && option <= playerList.size()) {
-                    oponent = playerList.get(option + 1);
+                    oponent = playerList.get(option - 1);
 
                 } else {
                     System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a player" + ConsoleColors.ANSI_RESET);

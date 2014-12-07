@@ -117,7 +117,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             while (result1.next()) {
                 Duel temp = new Duel();
-                temp.setDuelID(result1.getLong("duelId"));
+                temp.setDuelID(result1.getInt("duelId"));
                 temp.setStatus(result1.getString("status"));
                 //temp.setTurn(result1.getString("turn"));
                 //temp.setScorePlayer1(result1.getInt("scorePlayer1"));
@@ -155,7 +155,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             while (result1.next()) {
                 Duel temp = new Duel();
-                temp.setDuelID(result1.getLong("duelId"));
+                temp.setDuelID(result1.getInt("duelId"));
                 temp.setStatus(result1.getString("status"));
                 //temp.setTurn(result1.getString("turn"));
                 //temp.setScorePlayer1(result1.getInt("scorePlayer1"));
@@ -205,7 +205,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
         try {
             //@TODO change activeuser to turn
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "UPDATE duel SET ACTIVEUSER = ? WHERE DUELID = ?");
+                    "UPDATE duel SET TURN = ? WHERE DUELID = ?");
             preparedStatement.setString(1, adversary);
             preparedStatement.setInt(2, idDuel);
             preparedStatement.executeUpdate();
@@ -243,7 +243,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             while (result1.next()) {
                 Duel temp = new Duel();
-                temp.setDuelID(result1.getLong("duelId"));
+                temp.setDuelID(result1.getInt("duelId"));
                 temp.setStatus(result1.getString("status"));
                 temp.setTurn(result1.getString("turn"));
                 temp.setScorePlayer1(result1.getInt("scorePlayer1"));
@@ -281,7 +281,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             while (result1.next()) {
                 Duel temp = new Duel();
-                temp.setDuelID(result1.getLong("duelId"));
+                temp.setDuelID(result1.getInt("duelId"));
                 temp.setStatus(result1.getString("status"));
                 temp.setTurn(result1.getString("turn"));
                 temp.setScorePlayer1(result1.getInt("scorePlayer1"));
@@ -319,7 +319,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
             while (result1.next()) {
                 Duel temp = new Duel();
-                temp.setDuelID(result1.getLong("duelId"));
+                temp.setDuelID(result1.getInt("duelId"));
                 temp.setStatus(result1.getString("status"));
                 temp.setTurn(result1.getString("turn"));
                 temp.setScorePlayer1(result1.getInt("scorePlayer1"));

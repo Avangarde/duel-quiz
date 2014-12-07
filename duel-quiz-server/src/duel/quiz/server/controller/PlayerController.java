@@ -186,7 +186,7 @@ public class PlayerController implements Runnable {
 
             for (Duel temp : duels) {
                 //Native data in BD
-                out.writeLong(temp.getDuelID());
+                out.writeInt(temp.getDuelID());
                 out.writeUTF(temp.getStatus());
                 //out.writeUTF("other");
                 out.writeUTF(temp.getTurn());
@@ -223,7 +223,7 @@ public class PlayerController implements Runnable {
 
             for (Duel temp : duels) {
                 //Native data in BD
-                out.writeLong(temp.getDuelID());
+                out.writeInt(temp.getDuelID());
                 out.writeUTF(temp.getStatus());
                 //out.writeUTF("other");
                 //out.writeUTF(temp.getTurn());

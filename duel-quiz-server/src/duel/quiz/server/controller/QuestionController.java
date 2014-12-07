@@ -257,6 +257,7 @@ public class QuestionController {
                 if (round.isP1HasPlayed() && !round.isP2HasPlayed()) {
                     //If only one, update the other 
                     RoundDAO.updateP2(duelID,roundID);
+                    DuelDAO.updateActivePlayer(adversary, duelID);
                 } else {
                     //If last round, then game over
                     if (round.getDuel().getDuelID() == 6) {

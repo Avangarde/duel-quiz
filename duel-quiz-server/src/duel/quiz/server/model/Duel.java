@@ -10,7 +10,7 @@ package duel.quiz.server.model;
  */
 public class Duel {
 
-    private long duelID;
+    private int duelID;
     //TODO Enum for String
     private String status;
     //How to determine which one is which
@@ -58,11 +58,11 @@ public class Duel {
         this.turn = turn;
     }
 
-    public long getDuelID() {
+    public int getDuelID() {
         return duelID;
     }
 
-    public void setDuelID(long duelID) {
+    public void setDuelID(int duelID) {
         this.duelID = duelID;
     }
 
@@ -90,12 +90,12 @@ public class Duel {
         this.scorePlayer2 = scorePlayer2;
     }
 
-    public Duel(long duelID, String status) {
+    public Duel(int duelID, String status) {
         this.duelID = duelID;
         this.status = status;
     }
 
-    public Duel(long duelID, String status, int scorePlayer1, int scorePlayer2) {
+    public Duel(int duelID, String status, int scorePlayer1, int scorePlayer2) {
         this.duelID = duelID;
         this.status = status;
         this.scorePlayer1 = scorePlayer1;
