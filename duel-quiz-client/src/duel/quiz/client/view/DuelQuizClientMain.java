@@ -258,7 +258,6 @@ public class DuelQuizClientMain {
 
         //If the game is RUNNING and it is the players turn is displayed on red.
         //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
-
         int exit = games.size() + 1;
         while (option != exit) {
             System.out.println("What do you want to do?");
@@ -354,14 +353,14 @@ public class DuelQuizClientMain {
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             playerController.challengePlayer(currentPlayer.getUser(), opponent);
-            System.out.println("You must wait until player " + opponent 
+            System.out.println("You must wait until player " + opponent
                     + " accepts the challenge...");
             Thread.sleep(1000);
             gameRoomMenu();
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             challengePlayer(opponent);
-        } catch (InterruptedException ex) {            
+        } catch (InterruptedException ex) {
         }
     }
 
@@ -374,7 +373,7 @@ public class DuelQuizClientMain {
                 System.out.println("Wait for your adversary to play");
             } else if (each.getTurn().equals(currentPlayer.getUser())) {
                 System.out.println("You chose to battle " + each.getAdversary());
-                PlayerController.continueDuel(each.getDuelID());
+                continueDuel(each.getDuelID(), each.getAdversary());
             }
         }
         if (each.getStatus().equals(PlayerController.WAITING)) {
@@ -386,13 +385,10 @@ public class DuelQuizClientMain {
                 int input = readInteger();
                 if (input == 1) {
                     System.out.println("You accepted the challenge");
-                    PlayerController.continueDuel(each.getDuelID());
-
+                    continueDuel(each.getDuelID(), each.getAdversary());
                 } else {
                     System.out.println("You refused the challenge");
-
                 }
-
             }
         }
     }
@@ -448,7 +444,7 @@ public class DuelQuizClientMain {
 
                 option = readInteger();
                 if (option > 0 && option <= playerList.size()) {
-                    oponent = playerList.get(option+1);
+                    oponent = playerList.get(option + 1);
 
                 } else {
                     System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a player" + ConsoleColors.ANSI_RESET);
@@ -598,5 +594,23 @@ public class DuelQuizClientMain {
         answerIndividualQuestion(categorySelected.getListQuestions().get(1), true);
         System.out.println("Second Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
+    }
+
+    private static void continueDuel(long duelID, String adversary) {
+        try {
+            ticket = TicketController.validateTicket(ticket);
+
+            PlayerController playerController = new PlayerController(ticket.getServerAddress());
+            List<Category> round = playerController.getQuestions();
+            //Important to pass to server
+            Category categorySelected = pickCategory(round);
+
+            answerAllQuestions(categorySelected);
+
+            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser());
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            return;
+        }
     }
 }

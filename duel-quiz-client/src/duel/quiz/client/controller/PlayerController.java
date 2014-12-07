@@ -35,6 +35,7 @@ public class PlayerController extends AbstractController {
     private static final String GET_PLAYERS = "GET PLAYERS";
     private static final String CHALLENGE = "CHALLENGE";
     private static final String GET_DUELS = "GET DUELS";
+    private static final String GET_QUESTIONS = "GET QUESTIONS";
     
     //Values for duel status
     public static String ENDED = "Fini";
@@ -281,6 +282,56 @@ public class PlayerController extends AbstractController {
             return ret;
         }
     }
+    
+    public List<Category> getQuestions() {
+        List<Category> ret = new ArrayList<>();
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        try {
+            skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            output.writeUTF(GET_QUESTIONS);
+            output.writeUTF(DuelQuizClientMain.currentPlayer.getUser());
+            output.flush();
+
+            //Receive the questions and deal with them
+            Category category1 = new Category(input.readUTF());
+            Category category2 = new Category(input.readUTF());
+            Category category3 = new Category(input.readUTF());
+
+            List<Question> questionsCat1 = new ArrayList<Question>(3);
+            List<Question> questionsCat2 = new ArrayList<Question>(3);
+            List<Question> questionsCat3 = new ArrayList<Question>(3);
+
+            readQuestions(input, category1, questionsCat1);
+            readQuestions(input, category2, questionsCat2);
+            readQuestions(input, category3, questionsCat3);
+
+            category1.setListQuestions(questionsCat1);
+            category2.setListQuestions(questionsCat2);
+            category3.setListQuestions(questionsCat3);
+
+            ret.add(category1);
+            ret.add(category2);
+            ret.add(category3);
+
+            //@TODO Receive the answers and deal with them
+            skClient.close();
+
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
+        } catch (IOException ex) {
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
+        }finally{
+            return ret;
+        }
+    }
 
     private void readQuestions(DataInputStream input, Category category, List<Question> questions) throws IOException {
         for (int i = 0; i < 3; i++) {
@@ -292,6 +343,8 @@ public class PlayerController extends AbstractController {
             }
         }
     }
+    
+    
     
     public void challengePlayer(String player, String opponent) throws ServerDownException {
         Socket skClient;
