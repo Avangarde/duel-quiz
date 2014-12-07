@@ -91,15 +91,17 @@ public class PlayerController implements Runnable {
         long actualTime = System.currentTimeMillis();
         for (Iterator<Ticket> iterator = server.getTickets().iterator(); iterator.hasNext();) {
             Ticket ticket = iterator.next();
-            if ((actualTime - ticket.getLastConnexion().getTime()) / 1000
-                    > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
-                if (ticket.getPlayer() != null) {
-                    PlayerDAO.setPlayerStatus(ticket.getPlayer().getUser(), false);
+            if (ticket != null) {
+                if ((actualTime - ticket.getLastConnexion().getTime()) / 1000
+                        > TimeUnit.MINUTES.toSeconds(REMOVE_PLAYERS_MINUTES)) {
+                    if (ticket.getPlayer() != null) {
+                        PlayerDAO.setPlayerStatus(ticket.getPlayer().getUser(), false);
+                    }
+                    server.getTickets().remove(ticket);
+                    
+                    System.out.println("Removed player " + ticket);
+                    //@TODO Update #players and send it to the LB
                 }
-                server.getTickets().remove(ticket);
-
-                System.out.println("Removed player " + ticket);
-                //@TODO Update #players and send it to the LB
             }
         }
     }
@@ -186,19 +188,19 @@ public class PlayerController implements Runnable {
                 //Native data in BD
                 out.writeLong(temp.getDuelID());
                 out.writeUTF(temp.getStatus());
-                out.writeUTF("other");
-                //out.writeUTF(temp.getTurn());
+                //out.writeUTF("other");
+                out.writeUTF(temp.getTurn());
                 out.writeInt(temp.getScorePlayer1());
                 out.writeInt(temp.getScorePlayer2());
 
                 //Not so native stuff
-//                out.writeUTF(temp.getAdversary());
-                out.writeUTF("other");
+                out.writeUTF(temp.getAdversary());
+//                out.writeUTF("other");
 
                 out.writeUTF(temp.getPlayer1());
-                out.writeUTF("other");
+//                out.writeUTF("other");
 
-                //      out.writeUTF(temp.getPlayer2());
+                out.writeUTF(temp.getPlayer2());
 
             }
         } catch (IOException ex) {
