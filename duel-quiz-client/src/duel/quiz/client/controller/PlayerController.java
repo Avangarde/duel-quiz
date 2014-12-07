@@ -34,6 +34,7 @@ public class PlayerController extends AbstractController {
     private static final String RANDOMPLAY = "RANDOMPLAY";
     private static final String GET_PLAYERS = "GET PLAYERS";
     private static final String CHALLENGE = "CHALLENGE";
+    private static final String GET_DUELS = "GET DUELS";
     
     //Values for duel status
     public static String ENDED = "Fini";
