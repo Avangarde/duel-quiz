@@ -7,6 +7,7 @@ package duel.quiz.server.controller;
 import duel.quiz.server.model.Answer;
 import duel.quiz.server.model.Category;
 import duel.quiz.server.model.Question;
+import duel.quiz.server.model.Round;
 import duel.quiz.server.model.dao.AnswerDAO;
 import duel.quiz.server.model.dao.DuelDAO;
 import java.util.List;
@@ -97,7 +98,7 @@ public class QuestionController {
 
     /**
      * Construct the response with all these values (and also the correct answer)
-     * 
+     *
      *     data is constructed as follows:
      *     --------------------
      *     String:   name of cat1
@@ -121,7 +122,6 @@ public class QuestionController {
      * @param in
      */
     public static void sendNewQuestions(DataOutputStream out, DataInputStream in) {
-        //@TODO Set Round to 1 (Can't do until Player answer)
 
         //Get 3 random categories
         List<Category> categories = QuestionDAO.getAllCategoriesWithQuestions();
@@ -152,7 +152,7 @@ public class QuestionController {
         setAnswers(questionsCat3);
 
         try {
-             
+
             out.writeUTF(nameCat1);
             out.writeUTF(nameCat2);
             out.writeUTF(nameCat3);
@@ -196,25 +196,16 @@ public class QuestionController {
         }
     }
 
-    public static Category receivePlayedData(int cases, DataOutputStream out, DataInputStream in) {
-        
+    public static Category receivePlayedData(int i, DataOutputStream out, DataInputStream in, String user, String adversary) {
+
         Category ret = new Category();
-        
+
         try {
-            
-            //User
-            String user = in.readUTF();
-            
-            //USER ADVERSARY
-            //String adversary = in.readUTF();
-            
-            //DUEL ID
-            
             int duelID = in.readInt();
-            
+
             //Name
             ret.setName(in.readUTF());
-            
+
             //Question
             //I am so sorry for this code :/
             ret.setListQuestions(new ArrayList<Question>());
@@ -236,63 +227,69 @@ public class QuestionController {
             ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
             ret.getListQuestions().get(2).getAnswers().add(new Answer(in.readUTF(), in.readBoolean(), in.readBoolean()));
-            
-            System.out.println("TODO LO RECIBI BIEEEEEEN" + '\n');
-            
-            //TODO Database operations
-            
+
             //Obtain questions IDS
-            
             ret.getListQuestions().get(0).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(0).getQuestion()));
             ret.getListQuestions().get(1).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(1).getQuestion()));
             ret.getListQuestions().get(2).setQuestionID(QuestionDAO.getByName(ret.getListQuestions().get(2).getQuestion()));
-            
+
             //@TODO Obtain Answers Ids
             List<Answer> answersToPersist = new ArrayList<>();
-            
-            for (Question each : ret.getListQuestions()){
-                for (Answer each2 : each.getAnswers()){
-                    if (each2.isChosenByAdversary()){
+
+            for (Question each : ret.getListQuestions()) {
+                for (Answer each2 : each.getAnswers()) {
+                    if (each2.isChosenByAdversary()) {
                         each2.setAnswerID(AnswerDAO.getByString(each2.getAnswer()));
                         answersToPersist.add(each2);
                     }
                 }
             }
-            
-            //Duel
-            //int duelID = DuelDAO.create("WAITING");
-            //DuelDAO.linkPlayerToDuel(user,duelID);
-            
+
             //Round
-            int roundID = RoundDAO.create(duelID, ret.getName());
+            Round round = RoundDAO.findMaxRound(duelID);
+            int roundID;
+            //If there are no rounds, then create the first one
+            if (round == null) {
+                roundID = 1;
+                RoundDAO.create(duelID, roundID, ret.getName());
+            } else { 
+                roundID = round.getRoundID();
+                if (round.isP1HasPlayed() && !round.isP2HasPlayed()) {
+                    //If only one, update the other 
+                    RoundDAO.updateP2(duelID,roundID);
+                } else {
+                    //If last round, then game over
+                    if (round.getDuel().getDuelID() == 6) {
+                        //TODO inform the players
+                        System.out.println("Game Over");
+                    } else {
+                        //If both players had answered, then create a new round
+                        RoundDAO.create(duelID, ++roundID, ret.getName());
+                    }
+                }
+            }
+            
             //Upon creation always first turn
-            roundID = 1;
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(0).getQuestionID());
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(1).getQuestionID());
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(2).getQuestionID());
-            
+
             //Add Player Answers
-            
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID());
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID());
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID());
-            
+
             int player = 1;
             int score = countCorrectAnswers(answersToPersist);
             //Update Duel points
             DuelDAO.updateScore(duelID, score, player);
+            DuelDAO.updateActivePlayer(adversary, duelID);
 
-            //TODO Persist
-            out.writeUTF("Persisted :)");
+            out.writeUTF("OK");
         } catch (IOException ex) {
             Logger.getLogger(QuestionController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
         }
         return ret;
-    }
-
-    public static void transmitAdversaryPlayedData(Category received, DataOutputStream out, DataInputStream in) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static int countCorrectAnswers(List<Answer> answersToPersist) {

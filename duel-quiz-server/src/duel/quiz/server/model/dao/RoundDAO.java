@@ -4,33 +4,37 @@
  */
 package duel.quiz.server.model.dao;
 
+import duel.quiz.server.model.Category;
+import duel.quiz.server.model.Duel;
+import duel.quiz.server.model.Round;
 import static duel.quiz.server.model.dao.AbstractDataBaseDAO.connect;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author corteshs
  */
-public class RoundDAO extends AbstractDataBaseDAO{
+public class RoundDAO extends AbstractDataBaseDAO {
 
-    public static int create(int duelID, String name) {
+    public static void create(int duelID, int roundID, String name) {
         Connection connection = connect();
-        int ret = -1;
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "Insert into ROUND "
-                            + "(DUELID,ROUNDID,P1HASPLAYED,P2HASPLAYED,CATEGORYNAME) "
-                            + "values (?,'1','1','0',?)");
+                    + "(DUELID,ROUNDID,P1HASPLAYED,P2HASPLAYED,CATEGORYNAME) "
+                    + "values (?,?,'1','0',?)");
             statement.setInt(1, duelID);
-            statement.setString(2, name);
+            statement.setInt(2, roundID);
+            statement.setString(3, name);
 
             statement.executeUpdate();
-            
+
             statement.close();
             connection.close();
 
@@ -40,8 +44,6 @@ public class RoundDAO extends AbstractDataBaseDAO{
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
-        
-        return ret;
     }
 
     public static boolean linkRoundToQuestion(int duelID, int roundID, long questionID) {
@@ -54,11 +56,11 @@ public class RoundDAO extends AbstractDataBaseDAO{
             statement.setInt(2, roundID);
             statement.setLong(3, questionID);
 
-            statement.executeQuery();
-            
+            statement.executeUpdate();
+
             statement.close();
             connection.close();
-            
+
             ret = true;
 
         } catch (SQLIntegrityConstraintViolationException e) {
@@ -67,8 +69,51 @@ public class RoundDAO extends AbstractDataBaseDAO{
             System.out.println("Error");
             e.printStackTrace();
         }
-        
+
         return ret;
     }
-    
+
+    /**
+     * find the max round of the specified duel ID
+     *
+     * @param duelID
+     * @return
+     */
+    public static Round findMaxRound(int duelID) {
+        Connection connection = connect();
+        Round r = null;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ROUND WHERE DUELID = ? HAVING DUELID = (SELECT MAX(DUELID) FROM ROUND WHERE DUELID=?)");
+            ps.setInt(1, duelID);
+            ps.setInt(2, duelID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                r = new Round(rs.getInt(1), new Duel(rs.getInt(2), null), new Category(rs.getString(5)));
+                r.setP1HasPlayed(rs.getBoolean(3));
+                r.setP2HasPlayed(rs.getBoolean(4));
+            }
+            ps.close();
+            rs.close();
+            connection.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(RoundDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return r;
+    }
+
+    public static void updateP2(int duelId,int roundId) {
+        Connection c = connect();
+        try {
+            //
+            PreparedStatement ps = c.prepareStatement("UPDATE round SET P2HASPLAYED = 1 WHERE DUELID = ? AND ROUNDID = ?");
+            ps.setInt(1, duelId);
+            ps.setInt(2, roundId);
+            ps.executeUpdate();
+            ps.close();
+            c.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(RoundDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }

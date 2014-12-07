@@ -75,7 +75,7 @@ public class AnswerDAO extends AbstractDataBaseDAO {
             statement.setString(1, user);
             statement.setLong(2, answerID);
 
-            statement.executeQuery();
+            statement.executeUpdate();
 
             statement.close();
             connection.close();

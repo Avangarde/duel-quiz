@@ -7,6 +7,7 @@ package duel.quiz.client.controller;
 import static duel.quiz.client.controller.AbstractController.PORT;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
+import duel.quiz.client.model.Duel;
 import duel.quiz.client.model.Question;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -39,20 +40,17 @@ public class QuestionController extends AbstractController {
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-
             //Sending request for categories
             output.writeUTF(REQUEST_CATEGORIES);
             output.flush();
 
             String dataSent = input.readUTF();
 
-
             while (dataSent == null ? NO_MORE_CATEGORIES != null : !dataSent.equals(NO_MORE_CATEGORIES)) {
                 listCategories.add(dataSent);
                 dataSent = input.readUTF();
 
             }
-
 
             skClient.close();
         } catch (UnknownHostException ex) {
@@ -75,7 +73,6 @@ public class QuestionController extends AbstractController {
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-
             //Sending request for categories
             output.writeUTF(NEW_QUESTION);
             output.flush();
@@ -93,7 +90,6 @@ public class QuestionController extends AbstractController {
             //Final Status
             System.out.println(input.readUTF());
 
-
             skClient.close();
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,7 +102,7 @@ public class QuestionController extends AbstractController {
         return true;
     }
 
-    public void transmitPlayedData(Category categorySelected, String user) {
+    public void transmitPlayedData(Category categorySelected, String user, Duel duel) {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -115,26 +111,26 @@ public class QuestionController extends AbstractController {
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-
             //Sending request for categories
             output.writeUTF(SENDING_ROUND_DATA);
-            output.flush();
-
             output.writeUTF(user);
-            
+            output.writeUTF(duel.getAdversary());
+            output.writeInt(duel.getDuelID());
+
             //@TODO Solve IndexOutOfBoundsException
             output.writeUTF(categorySelected.getName());
-            
-            for (Question each : categorySelected.getListQuestions()){
-            
-            output.writeUTF(each.getQuestion());
-            //Repeats 4 times
-            for (Answer each2 : each.getAnswers()) {
-                output.writeUTF(each2.getAnswer());
-                output.writeBoolean(each2.isCorrect());
-                output.writeBoolean(each2.isChosenByAdversary());
-            }}
-            
+
+            for (Question each : categorySelected.getListQuestions()) {
+
+                output.writeUTF(each.getQuestion());
+                //Repeats 4 times
+                for (Answer each2 : each.getAnswers()) {
+                    output.writeUTF(each2.getAnswer());
+                    output.writeBoolean(each2.isCorrect());
+                    output.writeBoolean(each2.isChosenByAdversary());
+                }
+            }
+
             output.flush();
 
             //Final Status

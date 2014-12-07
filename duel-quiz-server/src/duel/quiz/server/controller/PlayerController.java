@@ -211,4 +211,50 @@ public class PlayerController implements Runnable {
 
 
     }
+
+    public void getNotifications(String user, DataOutputStream out, DataInputStream in) {
+        List<Duel> duels = new ArrayList<>();
+        duels = DuelDAO.getAllNotifications(user);
+        try {
+            //Pasar tamano de arreglo
+
+            out.writeInt(duels.size());
+            out.flush();
+
+            for (Duel temp : duels) {
+                //Native data in BD
+                out.writeLong(temp.getDuelID());
+                out.writeUTF(temp.getStatus());
+                //out.writeUTF("other");
+                //out.writeUTF(temp.getTurn());
+                //out.writeInt(temp.getScorePlayer1());
+                //out.writeInt(temp.getScorePlayer2());
+
+                //Not so native stuff
+                out.writeUTF(temp.getAdversary());
+                //out.writeUTF("other");
+
+                //out.writeUTF(temp.getPlayer1());
+                //out.writeUTF("other");
+
+                //out.writeUTF(temp.getPlayer2());
+
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void getNotificationNumber(String user, DataOutputStream out, DataInputStream in) {
+        int transmit = 0;
+        List<Duel> duels = DuelDAO.getAllNotifications(user);
+        try {
+            //Pasar tamano de arreglo
+
+            out.writeInt(duels.size());
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
