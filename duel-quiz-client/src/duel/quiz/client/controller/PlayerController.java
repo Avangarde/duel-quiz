@@ -38,9 +38,9 @@ public class PlayerController extends AbstractController {
     private static final String GET_QUESTIONS = "GET QUESTIONS";
     
     //Values for duel status
-    public static String ENDED = "Fini";
-    public static String RUNNING = "En cours";
-    public static String WAITING = "En attente";
+    public static final String ENDED = "Fini";
+    public static final String RUNNING = "En cours";
+    public static final String WAITING = "En attente";
 
     public List<Duel> getPlayerGames(String user) {
         //Create an array

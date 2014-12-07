@@ -291,8 +291,8 @@ public class DuelQuizClientMain {
 
             option = readInteger();
 
-            if (option >= 0 && option < exit) {
-                continueAgainstPlayer(games.get(option));
+            if (option > 0 && option < exit) {
+                continueAgainstPlayer(games.get(option - 1));
             } else if (option == exit) {
                 break;
             } else {
