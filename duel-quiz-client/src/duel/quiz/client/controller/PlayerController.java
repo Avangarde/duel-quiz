@@ -36,7 +36,8 @@ public class PlayerController extends AbstractController {
     private static final String CHALLENGE = "CHALLENGE";
     private static final String GET_DUELS = "GET DUELS";
     private static final String GET_QUESTIONS = "GET QUESTIONS";
-    
+    private static final String GET_NOTIFICATION_SIZE = "GETNOTSIZE";
+    private static final String GET_NOTIFICATIONS = "GETNOTIFICATIONS";
     //Values for duel status
     public static final String ENDED = "Fini";
     public static final String RUNNING = "En cours";
@@ -282,7 +283,7 @@ public class PlayerController extends AbstractController {
             return ret;
         }
     }
-    
+
     public List<Category> getQuestions() {
         List<Category> ret = new ArrayList<>();
         Socket skClient;
@@ -328,7 +329,7 @@ public class PlayerController extends AbstractController {
         } catch (IOException ex) {
             throw new ServerDownException("Server Down!");
 //            System.out.println("IO Exception");
-        }finally{
+        } finally {
             return ret;
         }
     }
@@ -343,9 +344,7 @@ public class PlayerController extends AbstractController {
             }
         }
     }
-    
-    
-    
+
     public void challengePlayer(String player, String opponent) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
@@ -432,7 +431,7 @@ public class PlayerController extends AbstractController {
 
     public int fetchNotificationNumber(String user) {
         int ret = 0;
-        
+
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -455,7 +454,7 @@ public class PlayerController extends AbstractController {
             //How many will i receive?
             ret = input.readInt();
 
-            
+
             skClient.close();
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -465,8 +464,8 @@ public class PlayerController extends AbstractController {
         } catch (IOException ex) {
 //            System.out.println("IO Exception");
         }
-        
+
         return ret;
-    
+
     }
 }
