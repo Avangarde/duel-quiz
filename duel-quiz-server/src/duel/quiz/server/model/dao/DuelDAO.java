@@ -103,19 +103,93 @@ public class DuelDAO extends AbstractDataBaseDAO {
         List<Duel> duelList = new ArrayList<>();
 
         Connection connection = connect();
-        PreparedStatement statement;
-        try {
-            statement = connection.prepareStatement(
-                    "SELECT * FROM Duel "
-                    + "WHERE turn = ?");
-            statement.setString(1, user);
-            ResultSet result = statement.executeQuery();
 
-            while (result.next()) {
-                duelList.add(new Duel(result.getLong("duelId"), result.getString("status"), result.getInt("scorePlayer1"), result.getInt("scorePlayer2")));
+        String statement1 = "SELECT * "
+                + "FROM Duel WHERE turn=? AND status = ?";
+        String statement2 = "SELECT * FROM PlayerDuel WHERE duelid = ?";
+
+
+        PreparedStatement pStatement1;
+        PreparedStatement pStatement2;
+        try {
+            pStatement1 = connection.prepareStatement(statement1);
+            pStatement1.setString(1, user);
+            pStatement1.setString(2, RUNNING);
+
+            ResultSet result1 = pStatement1.executeQuery();
+
+            while (result1.next()) {
+                Duel temp = new Duel();
+                temp.setDuelID(result1.getLong("duelId"));
+                temp.setStatus(result1.getString("status"));
+                //temp.setTurn(result1.getString("turn"));
+                //temp.setScorePlayer1(result1.getInt("scorePlayer1"));
+                //temp.setScorePlayer2(result1.getInt("scorePlayer2"));
+
+                pStatement2 = connection.prepareStatement(statement2);
+                pStatement2.setLong(1, temp.getDuelID());
+
+                ResultSet result2 = pStatement2.executeQuery();
+                //This should return two players per due, the first and the second
+                while (result2.next()) {
+                    if (temp.getPlayer1() == null) {
+                        temp.setPlayer1(result2.getString("username"));
+                    } else if (temp.getPlayer2() == null) {
+                        temp.setPlayer2(result2.getString("username"));
+                    }
+                }
+                result2.close();
+                pStatement2.close();
+
+                if (user.equals(temp.getPlayer1())) {
+                    temp.setAdversary(temp.getPlayer2());
+                } else if (user.equals(temp.getPlayer2())) {
+                    temp.setAdversary(temp.getPlayer1());
+                }
+
+                duelList.add(temp);
             }
-            result.close();
-            statement.close();
+
+            pStatement1 = connection.prepareStatement(statement1);
+            pStatement1.setString(1, user);
+            pStatement1.setString(2, WAITING);
+
+            result1 = pStatement1.executeQuery();
+
+            while (result1.next()) {
+                Duel temp = new Duel();
+                temp.setDuelID(result1.getLong("duelId"));
+                temp.setStatus(result1.getString("status"));
+                //temp.setTurn(result1.getString("turn"));
+                //temp.setScorePlayer1(result1.getInt("scorePlayer1"));
+                //temp.setScorePlayer2(result1.getInt("scorePlayer2"));
+
+                pStatement2 = connection.prepareStatement(statement2);
+                pStatement2.setLong(1, temp.getDuelID());
+
+                ResultSet result2 = pStatement2.executeQuery();
+                //This should return two players per due, the first and the second
+                while (result2.next()) {
+                    if (temp.getPlayer1() == null) {
+                        temp.setPlayer1(result2.getString("username"));
+                    } else if (temp.getPlayer2() == null) {
+                        temp.setPlayer2(result2.getString("username"));
+                    }
+                }
+                result2.close();
+                pStatement2.close();
+
+                if (user.equals(temp.getPlayer1())) {
+                    temp.setAdversary(temp.getPlayer2());
+                } else if (user.equals(temp.getPlayer2())) {
+                    temp.setAdversary(temp.getPlayer1());
+                }
+
+                duelList.add(temp);
+            }
+
+            result1.close();
+            pStatement1.close();
         } catch (SQLException ex) {
             Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
