@@ -292,8 +292,8 @@ public class DuelQuizClientMain {
 
             option = readInteger();
 
-            if (option >= 0 && option < exit) {
-                continueAgainstPlayer(games.get(option));
+            if (option > 0 && option < exit) {
+                continueAgainstPlayer(games.get(option - 1));
             } else if (option == exit) {
                 break;
             } else {
@@ -354,14 +354,14 @@ public class DuelQuizClientMain {
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             playerController.challengePlayer(currentPlayer.getUser(), opponent);
-            System.out.println("You must wait until player " + opponent 
+            System.out.println("You must wait until player " + opponent
                     + " accepts the challenge...");
             Thread.sleep(1000);
             gameRoomMenu();
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             challengePlayer(opponent);
-        } catch (InterruptedException ex) {            
+        } catch (InterruptedException ex) {
         }
     }
 
@@ -448,7 +448,7 @@ public class DuelQuizClientMain {
 
                 option = readInteger();
                 if (option > 0 && option <= playerList.size()) {
-                    oponent = playerList.get(option+1);
+                    oponent = playerList.get(option + 1);
 
                 } else {
                     System.out.println(ConsoleColors.ANSI_RED + "Invalid Option: Choose a player" + ConsoleColors.ANSI_RESET);
