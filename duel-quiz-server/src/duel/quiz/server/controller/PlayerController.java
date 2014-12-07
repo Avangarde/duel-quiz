@@ -174,34 +174,39 @@ public class PlayerController implements Runnable {
     public void getPlayerGames(String user, DataOutputStream out, DataInputStream in) {
 //Obtener todos los duelos del jugador segun estado
         //Popular lista
-        List<Duel> duels= new ArrayList<>();
+        List<Duel> duels = new ArrayList<>();
         duels = DuelDAO.getAllDuels(user);
         try {
             //Pasar tamano de arreglo
-            
+
             out.writeInt(duels.size());
             out.flush();
-            
+
             for (Duel temp : duels) {
                 //Native data in BD
                 out.writeLong(temp.getDuelID());
                 out.writeUTF(temp.getStatus());
-                out.writeUTF(temp.getTurn());
+                out.writeUTF("other");
+                //out.writeUTF(temp.getTurn());
                 out.writeInt(temp.getScorePlayer1());
                 out.writeInt(temp.getScorePlayer2());
 
                 //Not so native stuff
-                out.writeUTF(temp.getAdversary());
+//                out.writeUTF(temp.getAdversary());
+                out.writeUTF("other");
+
                 out.writeUTF(temp.getPlayer1());
-                out.writeUTF(temp.getPlayer2());
+                out.writeUTF("other");
+
+                //      out.writeUTF(temp.getPlayer2());
 
             }
         } catch (IOException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
-        
+
+
+
+
     }
 }

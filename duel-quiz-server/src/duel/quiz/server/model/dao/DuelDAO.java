@@ -136,7 +136,8 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
         Connection connection = connect();
 
-        String statement1 = "SELECT * FROM Duel WHERE turn = ? AND status = ?";
+        String statement1 = "SELECT d.duelid, status, scoreplayer1, scoreplayer2, turn, username "
+                + "FROM Duel d, PlayerDuel p WHERE d.DUELID = p.DUELID AND p.USERNAME=? AND d.status = ?";
         String statement2 = "SELECT * FROM PlayerDuel WHERE duelid = ?";
 
 
@@ -159,6 +160,8 @@ public class DuelDAO extends AbstractDataBaseDAO {
                 temp.setScorePlayer2(result1.getInt("scorePlayer2"));
 
                 pStatement2 = connection.prepareStatement(statement2);
+                pStatement2.setLong(1, temp.getDuelID());
+
                 ResultSet result2 = pStatement2.executeQuery();
                 //This should return two players per due, the first and the second
                 while (result2.next()) {
@@ -179,13 +182,13 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
                 duelList.add(temp);
             }
-            
+
             pStatement1 = connection.prepareStatement(statement1);
             pStatement1.setString(1, user);
             pStatement1.setString(2, RUNNING);
 
             result1 = pStatement1.executeQuery();
-            
+
             while (result1.next()) {
                 Duel temp = new Duel();
                 temp.setDuelID(result1.getLong("duelId"));
@@ -195,6 +198,8 @@ public class DuelDAO extends AbstractDataBaseDAO {
                 temp.setScorePlayer2(result1.getInt("scorePlayer2"));
 
                 pStatement2 = connection.prepareStatement(statement2);
+                pStatement2.setLong(1, temp.getDuelID());
+
                 ResultSet result2 = pStatement2.executeQuery();
                 //This should return two players per due, the first and the second
                 while (result2.next()) {
@@ -215,13 +220,13 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
                 duelList.add(temp);
             }
-            
+
             pStatement1 = connection.prepareStatement(statement1);
             pStatement1.setString(1, user);
             pStatement1.setString(2, WAITING);
 
             result1 = pStatement1.executeQuery();
-            
+
             while (result1.next()) {
                 Duel temp = new Duel();
                 temp.setDuelID(result1.getLong("duelId"));
@@ -231,6 +236,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
                 temp.setScorePlayer2(result1.getInt("scorePlayer2"));
 
                 pStatement2 = connection.prepareStatement(statement2);
+                pStatement2.setLong(1, temp.getDuelID());
                 ResultSet result2 = pStatement2.executeQuery();
                 //This should return two players per due, the first and the second
                 while (result2.next()) {
@@ -251,7 +257,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
                 duelList.add(temp);
             }
-            
+
             result1.close();
             pStatement1.close();
         } catch (SQLException ex) {
