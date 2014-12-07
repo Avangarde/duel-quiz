@@ -29,7 +29,7 @@ public class Server implements Comparable<Server> {
     private LinkedList<String> queueDB;
     public static final String NO_DISPONIBLE = "NO_DISPONIBLE";
     public static final String DISPONIBLE = "DISPONIBLE";
-    public static final String DATE_FORMAT = "dd/MM/YYYY HH:mm:ss";
+    public static final String DATE_FORMAT = "dd/MM/YYYY HH:mm:ss";    
     //Only for loadBalancer
     private TreeSet<Server> servers;
 

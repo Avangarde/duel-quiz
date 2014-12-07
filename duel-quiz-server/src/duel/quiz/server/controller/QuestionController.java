@@ -296,6 +296,12 @@ public class QuestionController {
     }
 
     private static int countCorrectAnswers(List<Answer> answersToPersist) {
-        return 0;
+        int sum = 0;
+        for (Answer answer : answersToPersist) {
+            if (answer.isCorrect()) {
+                sum += 1;
+            }
+        }
+        return sum;
     }
 }

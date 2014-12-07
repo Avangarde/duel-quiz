@@ -27,7 +27,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
     public static final String RUNNING = "En cours";
     public static final String WAITING = "En attente";
 
-    public static int create(String status, String activeUser) {
+    public static int create(String status, String turn) {
 
         Connection connection = connect();
         int ret = -1;
@@ -47,10 +47,10 @@ public class DuelDAO extends AbstractDataBaseDAO {
             PreparedStatement statement = connection.prepareStatement(
                     "Insert into DUEL "
                     + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,TURN) "
-                    + "values (?,?,'1','0',?)");
+                    + "values (?,?,'0','0',?)");
             statement.setLong(1, ret);
             statement.setString(2, status);
-            statement.setString(3, activeUser);
+            statement.setString(3, turn);
 
             int res = statement.executeUpdate();
 
@@ -67,7 +67,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
         return ret;
     }
-
+    
     public static boolean linkPlayerToDuel(String user, int duelID) {
         Connection connection = connect();
         boolean ret = false;
