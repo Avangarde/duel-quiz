@@ -342,9 +342,7 @@ public class DuelQuizClientMain {
 
         //TODO fetch actual gamers, this players are sorted in a particular form
         List<Duel> games = new ArrayList<Duel>();
-        games = PlayerController.getPlayerGames(currentPlayer.getUser());
-
-
+        games = new PlayerController(ticket.getServerAddress()).getPlayerGames(currentPlayer.getUser());
 
         return games;
     }

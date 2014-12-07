@@ -4,6 +4,7 @@
  */
 package duel.quiz.client.controller;
 
+import static duel.quiz.client.controller.AbstractController.PORT;
 import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
@@ -31,14 +32,68 @@ public class PlayerController extends AbstractController {
     private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
     private static final String GET_PLAYERS = "GET PLAYERS";
+    private static final String GET_DUELS = "GET DUELS";
     //Values for duel status
     public static String ENDED = "Fini";
     public static String RUNNING = "En cours";
     public static String WAITING = "En attente";
 
+    public List<Duel> getPlayerGames(String user) {
+        //Create an array
+        List<Duel> ret = new ArrayList<>();
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        try {
+            //@TODO: deal with java.net.ConnectException
+            //Create Socket
 
-    public static List<Duel> getPlayerGames(String user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            //Send message
+
+            output.writeUTF(GET_DUELS);
+            output.writeUTF(user);
+            output.flush();
+
+            //Populate array
+            //How many will i receive?
+            int it = input.readInt();
+
+            for (int j = 1; j <= it; j++) {
+                Duel temp = new Duel();
+
+                //Native data in BD
+                temp.setDuelID(input.readLong());
+                temp.setStatus(input.readUTF());
+                temp.setTurn(input.readUTF());
+                temp.setScorePlayer1(input.readInt());
+                temp.setScorePlayer2(input.readInt());
+
+                //Not so native stuff
+                temp.setAdversary(input.readUTF());
+                temp.setPlayer1(input.readUTF());
+                temp.setPlayer2(input.readUTF());
+                ret.add(temp);
+
+            }
+
+            skClient.close();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (SocketTimeoutException ex) {
+            //@TODO Server fault 
+        } catch (IOException ex) {
+//            System.out.println("IO Exception");
+        }
+
+        //Populate array
+        //Return Array
+        return ret;
     }
 
     public static void continueDuel(long duelID) {
@@ -145,11 +200,11 @@ public class PlayerController extends AbstractController {
             output.flush();
 
             int numPlayers = input.readInt();
-            for (int i=0; i < numPlayers; i++) {
+            for (int i = 0; i < numPlayers; i++) {
                 String player = input.readUTF();
                 if (!player.equals(DuelQuizClientMain.currentPlayer.getUser())) {
                     listPlayers.add(player);
-                }                
+                }
             }
             input.readBoolean();
             skClient.close();
@@ -169,7 +224,7 @@ public class PlayerController extends AbstractController {
      *
      */
     public List<Category> obtainCategoryQuestionsAnswers() {
-        List<Category> ret= new ArrayList<>();
+        List<Category> ret = new ArrayList<>();
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -194,11 +249,11 @@ public class PlayerController extends AbstractController {
             readQuestions(input, category1, questionsCat1);
             readQuestions(input, category2, questionsCat2);
             readQuestions(input, category3, questionsCat3);
-            
+
             category1.setListQuestions(questionsCat1);
             category2.setListQuestions(questionsCat2);
             category3.setListQuestions(questionsCat3);
-            
+
             ret.add(category1);
             ret.add(category2);
             ret.add(category3);
@@ -208,7 +263,7 @@ public class PlayerController extends AbstractController {
 
             //@TODO Answer the questions and send the answers to the server
 
-                      
+
 
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
@@ -216,7 +271,7 @@ public class PlayerController extends AbstractController {
         } catch (IOException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("IO Exception");
-        }finally{
+        } finally {
             return ret;
         }
     }

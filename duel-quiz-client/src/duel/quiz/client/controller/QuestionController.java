@@ -140,7 +140,7 @@ public class QuestionController extends AbstractController {
             //Final Status
             System.out.println(input.readUTF());
             System.out.println("THANK YOU FOR PLAYING\n");
-            System.out.println("If the player accepts you will see the duel state in the notifications area :)\n");
+            System.out.println("If the player accepts you will see the duel state in the games area :)\n");
 
 
             skClient.close();
