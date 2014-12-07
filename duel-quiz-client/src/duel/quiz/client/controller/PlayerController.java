@@ -42,6 +42,8 @@ public class PlayerController extends AbstractController {
     public static final String RUNNING = "En cours";
     public static final String WAITING = "En Attente";
 
+    private Duel duel;
+
     public List<Duel> getPlayerGames(String user) {
         //Create an array
         List<Duel> ret = new ArrayList<>();
@@ -58,7 +60,6 @@ public class PlayerController extends AbstractController {
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
             //Send message
-
             output.writeUTF(GET_DUELS);
             output.writeUTF(user);
             output.flush();
@@ -71,7 +72,7 @@ public class PlayerController extends AbstractController {
                 Duel temp = new Duel();
 
                 //Native data in BD
-                temp.setDuelID(input.readLong());
+                temp.setDuelID(input.readInt());
                 temp.setStatus(input.readUTF());
                 temp.setTurn(input.readUTF());
                 temp.setScorePlayer1(input.readInt());
@@ -103,7 +104,7 @@ public class PlayerController extends AbstractController {
     public static void continueDuel(long duelID) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     private final int TIME_OUT = 300000;
 
     public PlayerController(String host) {
@@ -269,11 +270,10 @@ public class PlayerController extends AbstractController {
             int idDuel = input.readInt();
 
             skClient.close();
-
+            
+            duel = new Duel(idDuel, null);
+            duel.setAdversary(adv);
             //@TODO Answer the questions and send the answers to the server
-
-
-
         } catch (SocketTimeoutException | ConnectException ex) {
             //@TODO Server fault 
             throw new ServerDownException("Server Down!");
@@ -388,7 +388,6 @@ public class PlayerController extends AbstractController {
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
             //Send message
-
             output.writeUTF(GET_NOTIFICATIONS);
             output.writeUTF(user);
             output.flush();
@@ -401,7 +400,7 @@ public class PlayerController extends AbstractController {
                 Duel temp = new Duel();
 
                 //Native data in BD
-                temp.setDuelID(input.readLong());
+                temp.setDuelID(input.readInt());
                 temp.setStatus(input.readUTF());
                 //temp.setTurn(input.readUTF());
                 //temp.setScorePlayer1(input.readInt());
@@ -446,7 +445,6 @@ public class PlayerController extends AbstractController {
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
             //Send message
-
             output.writeUTF(GET_NOTIFICATION_SIZE);
             output.writeUTF(user);
             output.flush();
@@ -454,7 +452,6 @@ public class PlayerController extends AbstractController {
             //Populate array
             //How many will i receive?
             ret = input.readInt();
-
 
             skClient.close();
         } catch (UnknownHostException ex) {
@@ -469,11 +466,12 @@ public class PlayerController extends AbstractController {
         return ret;
 
     }
+
     public Duel getDuel() {
         return duel;
     }
 
     public void setDuel(Duel duel) {
         this.duel = duel;
-    }    
+    }
 }

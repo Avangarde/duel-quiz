@@ -613,7 +613,7 @@ public class DuelQuizClientMain {
 
             answerAllQuestions(categorySelected);
 
-            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser());
+            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(),duel);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             return;
