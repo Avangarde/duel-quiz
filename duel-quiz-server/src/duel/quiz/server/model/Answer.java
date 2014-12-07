@@ -9,7 +9,7 @@ package duel.quiz.server.model;
  * @author corteshs
  */
 public class Answer {
-    private long answerID;
+    private int answerID;
     private String answer;
     private boolean correct;
     
@@ -34,18 +34,18 @@ public class Answer {
     
     
 
-    public Answer(long answerID, String answer, boolean correct, Question questionID) {
+    public Answer(int answerID, String answer, boolean correct, Question questionID) {
         this.answerID = answerID;
         this.answer = answer;
         this.correct = correct;
         this.questionID = questionID;
     }
 
-    public long getAnswerID() {
+    public int getAnswerID() {
         return answerID;
     }
 
-    public void setAnswerID(long answerID) {
+    public void setAnswerID(int answerID) {
         this.answerID = answerID;
     }
 

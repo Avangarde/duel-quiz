@@ -276,9 +276,9 @@ public class QuestionController {
             RoundDAO.linkRoundToQuestion(duelID, roundID, ret.getListQuestions().get(2).getQuestionID());
 
             //Add Player Answers
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID());
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID());
-            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID());
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(0).getAnswerID(),duelID,roundID);
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID(),duelID,roundID);
+            AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID(),duelID,roundID);
 
             int player = 1;
             int score = countCorrectAnswers(answersToPersist);

@@ -95,7 +95,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             connection.close();
             ret = true;
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("User already exists");
+            System.out.println("The player already exists");
         } catch (SQLException e) {
             System.out.println("Error");
             e.printStackTrace();
