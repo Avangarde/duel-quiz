@@ -28,7 +28,6 @@ public class PlayerController extends AbstractController {
 
     private static final String LOGIN_SMS = "LOGIN";
     private static final String SIGNUP_SMS = "REGISTER";
-    private static final String NO_MORE_PLAYERS = "ENDOFDATA";
     private static final String RANDOMPLAY = "RANDOMPLAY";
     private static final String GET_PLAYERS = "GET PLAYERS";
     //Values for duel status
@@ -36,7 +35,8 @@ public class PlayerController extends AbstractController {
     public static String RUNNING = "En cours";
     public static String WAITING = "En attente";
 
-
+    private Duel duel;
+    
     public static List<Duel> getPlayerGames(String user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -44,6 +44,7 @@ public class PlayerController extends AbstractController {
     public static void continueDuel(long duelID) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
     private final int TIME_OUT = 300000;
 
     public PlayerController(String host) {
@@ -139,17 +140,16 @@ public class PlayerController extends AbstractController {
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
-
             //Sending request for players
             output.writeUTF(GET_PLAYERS);
             output.flush();
 
             int numPlayers = input.readInt();
-            for (int i=0; i < numPlayers; i++) {
+            for (int i = 0; i < numPlayers; i++) {
                 String player = input.readUTF();
                 if (!player.equals(DuelQuizClientMain.currentPlayer.getUser())) {
                     listPlayers.add(player);
-                }                
+                }
             }
             input.readBoolean();
             skClient.close();
@@ -169,7 +169,7 @@ public class PlayerController extends AbstractController {
      *
      */
     public List<Category> obtainCategoryQuestionsAnswers() {
-        List<Category> ret= new ArrayList<>();
+        List<Category> ret = new ArrayList<>();
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
@@ -194,29 +194,28 @@ public class PlayerController extends AbstractController {
             readQuestions(input, category1, questionsCat1);
             readQuestions(input, category2, questionsCat2);
             readQuestions(input, category3, questionsCat3);
-            
+
             category1.setListQuestions(questionsCat1);
             category2.setListQuestions(questionsCat2);
             category3.setListQuestions(questionsCat3);
-            
+
             ret.add(category1);
             ret.add(category2);
             ret.add(category3);
 
-            //@TODO Receive the answers and deal with them
+            String adv = input.readUTF();
+            int idDuel = input.readInt();
+
             skClient.close();
-
-            //@TODO Answer the questions and send the answers to the server
-
-                      
-
+            duel = new Duel(idDuel, null);
+            duel.setAdversary(adv);
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
         } catch (IOException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("IO Exception");
-        }finally{
+        } finally {
             return ret;
         }
     }
@@ -231,4 +230,12 @@ public class PlayerController extends AbstractController {
             }
         }
     }
+
+    public Duel getDuel() {
+        return duel;
+    }
+
+    public void setDuel(Duel duel) {
+        this.duel = duel;
+    }    
 }

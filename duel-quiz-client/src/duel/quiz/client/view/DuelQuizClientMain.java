@@ -72,7 +72,7 @@ public class DuelQuizClientMain {
      */
     private static int readInteger() throws NumberFormatException {
         int option = 0;
-        System.out.print("Select a number:\t");
+        System.out.print("\nSelect a number:\t");
         try {
             String input = reader.readLine();
             option = Integer.parseInt(input);
@@ -144,7 +144,11 @@ public class DuelQuizClientMain {
             }
             valid = false;
             while (!signed && !failed && !valid) {
-                System.out.println(cls + "Cannot " + msg + " \n\t Try Again ? ");
+                System.out.println(cls);
+                if (!signIn) {
+                    System.out.println("User Already Exists");
+                }
+                System.out.println("Cannot " + msg + " \n\t Try Again ? ");
                 System.out.println("\t1. Yes");
                 System.out.println("\t2. No\t");
                 switch (readInteger()) {
@@ -258,7 +262,6 @@ public class DuelQuizClientMain {
 
         //If the game is RUNNING and it is the players turn is displayed on red.
         //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
-
         int exit = games.size() + 1;
         while (option != exit) {
             System.out.println("What do you want to do?");
@@ -317,11 +320,11 @@ public class DuelQuizClientMain {
 
             switch (option) {
                 case 1:
-                    System.out.println("Random Challenge");
+                    System.out.println(cls + "Random Challenge");
                     randomChallenge();
                     break;
                 case 2:
-                    System.out.println("Challenge a player");
+                    System.out.println(cls + "Challenge a player");
                     String player;
 
                     player = pickPlayer();
@@ -343,8 +346,6 @@ public class DuelQuizClientMain {
         //TODO fetch actual gamers, this players are sorted in a particular form
         List<Duel> games = new ArrayList<Duel>();
         games = PlayerController.getPlayerGames(currentPlayer.getUser());
-
-
 
         return games;
     }
@@ -404,12 +405,13 @@ public class DuelQuizClientMain {
         //@TODO request the user for a random Player and get the questions
         PlayerController playerController = new PlayerController(ticket.getServerAddress());
         List<Category> round = playerController.obtainCategoryQuestionsAnswers();
+        Duel duel = playerController.getDuel();
         //Important to pass to server
         Category categorySelected = pickCategory(round);
 
         answerAllQuestions(categorySelected);
 
-        new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser());
+        new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(),duel);
 
     }
 
@@ -522,10 +524,10 @@ public class DuelQuizClientMain {
         while (option < 1 || option > 4) {
             int index = 1;
             for (Answer each : question.getAnswers()) {
-                System.out.println(index + " " + each.getAnswer() + "\n");
+                System.out.println(index + " " + each.getAnswer());
                 index++;
             }
-
+            System.out.println();
             option = readInteger();
         }
 
@@ -580,11 +582,11 @@ public class DuelQuizClientMain {
 
     private static void answerAllQuestions(Category categorySelected) {
         //@TODO answer the questions and send them to the Server
-        System.out.println("First Question in " + categorySelected.getName() + ":\n");
+        System.out.println("\nFirst Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(0), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        System.out.println("\nSecond Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(1), true);
-        System.out.println("Second Question in " + categorySelected.getName() + ":\n");
+        System.out.println("\nSecond Question in " + categorySelected.getName() + ":\n");
         answerIndividualQuestion(categorySelected.getListQuestions().get(2), true);
     }
 }

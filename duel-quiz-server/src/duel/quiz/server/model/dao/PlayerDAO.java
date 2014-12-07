@@ -14,12 +14,11 @@ import java.util.logging.Logger;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  * @author martijua
  */
 public class PlayerDAO extends AbstractDataBaseDAO {
-    
+
     private static final String AVAILABLE = "AVAILABLE";
     private static final String UNAVAILABLE = "UNAVAILABLE";
 
@@ -27,12 +26,11 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         Player player = null;
         Connection connection = connect();
 
-
         PreparedStatement statement;
         try {
             statement = connection.prepareStatement(
                     "SELECT * FROM Player "
-                            + "WHERE username = ? AND password = ?");
+                    + "WHERE username = ? AND password = ?");
             statement.setString(1, user);
             statement.setString(2, pass);
             ResultSet result = statement.executeQuery();
@@ -62,7 +60,6 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             status = UNAVAILABLE;
         }
 
-
         Connection conn = null;
         try {
             conn = connect();
@@ -70,9 +67,10 @@ public class PlayerDAO extends AbstractDataBaseDAO {
                     + "WHERE username = ?");
             stmt.setString(1, status);
             stmt.setString(2, user);
-            ResultSet rset = stmt.executeQuery();
+//            ResultSet rset = stmt.executeQuery();
+            int rset = stmt.executeUpdate();
 
-            rset.close();
+//            rset.close();
             stmt.close();
         } catch (SQLException e) {
             Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, e);
@@ -106,11 +104,10 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         }
         return ret;
     }
-    
+
     public static Player findPlayer(String user) {
         Player player = null;
         Connection connection = connect();
-
 
         PreparedStatement statement;
         try {
@@ -127,7 +124,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         } catch (SQLException ex) {
             Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
-          e.printStackTrace();
+            e.printStackTrace();
         } finally {
             try {
                 closeConnection(connection);
@@ -137,7 +134,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         }
         return player;
     }
-    
+
     public static List<Player> getAvailablePlayers() {
         List<Player> players = new ArrayList<>();
         Connection connection = connect();
@@ -165,7 +162,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         }
         return players;
     }
-    
+
     public static List<Player> getUnavailablePlayers() {
         List<Player> players = new ArrayList<>();
         Connection connection = connect();
@@ -192,5 +189,41 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             }
         }
         return players;
+    }
+
+    public static boolean alreadyPlaying(String usr, String adv) {
+        Connection connection = connect();
+        boolean ret = true;
+        PreparedStatement statement;
+        try {
+            statement = connection.prepareStatement(
+                    "SELECT DISTINCT d.status "
+                    + "FROM PLAYERDUEL p1,PLAYERDUEL p2,duel d "
+                    + "WHERE p1.username LIKE ? "
+                    + "AND p2.username LIKE ? "
+                    + "AND p1.duelid=p2.DUELID "
+                    + "AND p1.duelid=d.DUELID "
+                    + "AND d.status LIKE 'En Attente'");
+            statement.setString(1, usr);
+            statement.setString(2, adv);
+            ResultSet result = statement.executeQuery();
+
+            if (!result.next()) {
+                ret=false;
+            }
+            result.close();
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return ret;
     }
 }

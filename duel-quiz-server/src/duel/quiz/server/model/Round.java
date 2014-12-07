@@ -12,28 +12,30 @@ import java.util.List;
  */
 public class Round {
     
-    private long roundID;
+    private int roundID;
+    private boolean p1HasPlayed;
+    private boolean p2HasPlayed;
     
     //Foreign
-    private Duel duelID;
+    private Duel duel;
     private Category categoryName; 
     
     private List<Question> listQuestions;
 
-    public long getRoundID() {
+    public int getRoundID() {
         return roundID;
     }
 
-    public void setRoundID(long roundID) {
+    public void setRoundID(int roundID) {
         this.roundID = roundID;
     }
 
-    public Duel getDuelID() {
-        return duelID;
+    public Duel getDuel() {
+        return duel;
     }
 
-    public void setDuelID(Duel duelID) {
-        this.duelID = duelID;
+    public void setDuel(Duel duel) {
+        this.duel = duel;
     }
 
     public Category getCategoryName() {
@@ -52,12 +54,25 @@ public class Round {
         this.listQuestions = listQuestions;
     }
 
-    public Round(long roundID, Duel duelID, Category categoryName) {
+    public Round(int roundID, Duel duelID, Category categoryName) {
         this.roundID = roundID;
-        this.duelID = duelID;
+        this.duel = duelID;
         this.categoryName = categoryName;
     }
-    
-    
-    
+
+    public boolean isP1HasPlayed() {
+        return p1HasPlayed;
+    }
+
+    public void setP1HasPlayed(boolean p1HasPlayed) {
+        this.p1HasPlayed = p1HasPlayed;
+    }
+
+    public boolean isP2HasPlayed() {
+        return p2HasPlayed;
+    }
+
+    public void setP2HasPlayed(boolean p2HasPlayed) {
+        this.p2HasPlayed = p2HasPlayed;
+    }
 }

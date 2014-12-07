@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class DuelDAO extends AbstractDataBaseDAO {
 
-    public static int create(String waiting,String activeUser) {
+    public static int create(String waiting, String activeUser) {
 
         Connection connection = connect();
         int ret = -1;
@@ -38,18 +37,15 @@ public class DuelDAO extends AbstractDataBaseDAO {
             } else {
                 throw new SQLException();
             }
-
-
             PreparedStatement statement = connection.prepareStatement(
                     "Insert into DUEL "
-                            + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,ACTIVEUSER) "
-                            + "values (?,?,'1','0',?)");
+                    + "(DUELID,STATUS,SCOREPLAYER1,SCOREPLAYER2,ACTIVEUSER) "
+                    + "values (?,?,'1','0',?)");
             statement.setLong(1, ret);
             statement.setString(2, waiting);
             statement.setString(3, activeUser);
 
-            rs = statement.executeQuery();
-
+            statement.executeUpdate();
 
             statement.close();
             connection.close();
@@ -73,7 +69,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
             statement.setString(1, user);
             statement.setInt(2, duelID);
 
-            statement.executeQuery();
+            statement.executeUpdate();
 
             statement.close();
             connection.close();
@@ -123,7 +119,26 @@ public class DuelDAO extends AbstractDataBaseDAO {
         }
         return duelList;
 
+    }
 
-
+    public static void updateActivePlayer(String adversary,int idDuel) {
+        Connection connection=connect();
+        try {
+            //@TODO change activeuser to turn
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE duel SET ACTIVEUSER = ? WHERE DUELID = ?");
+            preparedStatement.setString(1, adversary);
+            preparedStatement.setInt(2, idDuel);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DuelDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
