@@ -67,10 +67,8 @@ public class PlayerDAO extends AbstractDataBaseDAO {
                     + "WHERE username = ?");
             stmt.setString(1, status);
             stmt.setString(2, user);
-//            ResultSet rset = stmt.executeQuery();
             int rset = stmt.executeUpdate();
-
-//            rset.close();
+           
             stmt.close();
         } catch (SQLException e) {
             Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, e);

@@ -100,6 +100,10 @@ public class Duel {
         this.scorePlayer2 = scorePlayer2;
     }
     
+    public Duel() {
+        
+    }
+    
     
     
 }
