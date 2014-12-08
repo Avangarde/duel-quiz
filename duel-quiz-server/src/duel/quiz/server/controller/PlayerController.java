@@ -99,7 +99,12 @@ public class PlayerController implements Runnable {
                     if (ticket.getPlayer() != null) {
                         PlayerDAO.setPlayerStatus(ticket.getPlayer().getUser(), false);
                     }
-                    server.getTickets().remove(ticket);
+                    if (server.getTickets().size() == 1) {
+                        server.getTickets().remove(ticket);
+                        break;
+                    } else {
+                        server.getTickets().remove(ticket);
+                    }
                     
                     System.out.println("Removed player " + ticket);
                     //@TODO Update #players and send it to the LB

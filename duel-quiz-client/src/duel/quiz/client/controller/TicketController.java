@@ -42,10 +42,10 @@ public class TicketController {
             socket.setSoTimeout(TIME_OUT);
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
-                System.out.println("Waiting for load balancer address...");
+                //System.out.println("Waiting for load balancer address...");
                 socket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println("Load Balancer: " + received);
+                //System.out.println("Load Balancer: " + received);
 
                 loadBalancerAddress = received;
 
@@ -74,7 +74,7 @@ public class TicketController {
             } else {
                 output.writeUTF(NO_LOGIN);
             }
-            System.out.print("Getting a new server address...");
+            //System.out.print("Getting a new server address...");
             output.flush();
             String address = input.readUTF();
             System.out.println("..." + address);

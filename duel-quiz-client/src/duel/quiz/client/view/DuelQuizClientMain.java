@@ -139,7 +139,7 @@ public class DuelQuizClientMain {
                     msg = "SignUp";
                 }
             } catch (ServerDownException ex) {
-                System.err.println("Server down :(");
+//                System.err.println("Server down :(");
                 ticket = null;
             }
             valid = false;
@@ -235,11 +235,16 @@ public class DuelQuizClientMain {
 
     private static void getNotifications() {
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             int nots = new PlayerController(ticket.getServerAddress()).fetchNotificationNumber(currentPlayer.getUser());
             System.out.println(ConsoleColors.ANSI_GREEN + "You have " + nots + " notification(s)" + ConsoleColors.ANSI_RESET);
         } catch (ServerDownException ex) {
-            getNotifications();
+            ticket = null;
+            gameRoomMenu();
         }
     }
 
@@ -247,7 +252,11 @@ public class DuelQuizClientMain {
         try {
             System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Notifications *****  *****  ****");
             Integer option = 0;
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             PlayerController controller = new PlayerController(ticket.getServerAddress());
             List<Duel> nots = controller.fetchNotifications(currentPlayer.getUser());
 
@@ -265,7 +274,9 @@ public class DuelQuizClientMain {
             System.out.println("\nPress any key to continue");
             readInteger();
         } catch (ServerDownException ex) {
-            displayNotifications();
+//            System.err.println("Server Down :(");
+            ticket = null;
+            gameRoomMenu();
         }
     }
 
@@ -273,7 +284,11 @@ public class DuelQuizClientMain {
         try {
             System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Current Games *****  *****  ****");
             Integer option = 0;
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             List<Duel> games = fetchCurrentGames();
             //For each game, depending on its conditions display a different action.
             //If the game is ENDED display in gray, its score displayed :)
@@ -332,6 +347,8 @@ public class DuelQuizClientMain {
                 }
             }
         } catch (ServerDownException ex) {
+//            System.err.println("Server Down :(");
+            ticket = null;
             displayCurrentGames();
         }
     }
@@ -376,20 +393,29 @@ public class DuelQuizClientMain {
     private static List<Duel> fetchCurrentGames() {
         try {
             //TODO fetch actual gamers, this players are sorted in a particular form
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             List<Duel> games = new ArrayList<Duel>();
             games = new PlayerController(ticket.getServerAddress()).getPlayerGames(currentPlayer.getUser());
 
             return games;
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             return fetchCurrentGames();
         }
     }
 
     private static void challengePlayer(String opponent) {
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             playerController.challengePlayer(currentPlayer.getUser(), opponent);
@@ -398,7 +424,8 @@ public class DuelQuizClientMain {
             Thread.sleep(1000);
             gameRoomMenu();
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             challengePlayer(opponent);
         } catch (InterruptedException ex) {
         }
@@ -436,9 +463,13 @@ public class DuelQuizClientMain {
 
     private static void randomChallenge() {
         Category categorySelected = null;
-        Duel duel = null ;
+        Duel duel = null;
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
 
             //@TODO request the user for a random Player and get the questions
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
@@ -449,7 +480,8 @@ public class DuelQuizClientMain {
 
             answerAllQuestions(categorySelected);
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             randomChallenge();
         }
         transmitPlayedData(categorySelected, duel);
@@ -463,7 +495,11 @@ public class DuelQuizClientMain {
      */
     private static String pickPlayer() {
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             List<String> playerList = playerController.fetchPlayerList();
@@ -486,7 +522,8 @@ public class DuelQuizClientMain {
             }
             return oponent;
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             return pickPlayer();
         }
     }
@@ -501,7 +538,11 @@ public class DuelQuizClientMain {
             String rightAnswer = "";
             ArrayList<String> wrongAnswers = new ArrayList<String>();
             QuestionController controller = new QuestionController();
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             List<String> categoryList = controller.fetchAllCategories();
 
             int exit = categoryList.size() + 1;
@@ -544,7 +585,8 @@ public class DuelQuizClientMain {
             //Correct Answer
             //Other answers
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             suggestQuestion();
         }
 
@@ -638,7 +680,11 @@ public class DuelQuizClientMain {
 
     private static void continueDuel(Duel duel) {
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             List<Category> round = playerController.getQuestions();
@@ -657,17 +703,23 @@ public class DuelQuizClientMain {
             answerAllQuestions(categorySelected);
             new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(), duel);
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             return;
         }
     }
 
     private static void transmitPlayedData(Category categorySelected, Duel duel) {
         try {
-            ticket = TicketController.validateTicket(ticket);
+            if (ticket == null) {
+                ticket = TicketController.getNewTicket();
+            } else {
+                ticket = TicketController.validateTicket(ticket);
+            }
             new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(), duel);
         } catch (ServerDownException ex) {
-            System.err.println("Server down :(");
+//            System.err.println("Server down :(");
+            ticket = null;
             transmitPlayedData(categorySelected, duel);
         }
     }
