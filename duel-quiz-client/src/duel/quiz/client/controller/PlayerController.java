@@ -45,7 +45,7 @@ public class PlayerController extends AbstractController {
 
     private Duel duel;
 
-    public List<Duel> getPlayerGames(String user) {
+    public List<Duel> getPlayerGames(String user) throws ServerDownException {
         //Create an array
         List<Duel> ret = new ArrayList<>();
         Socket skClient;
@@ -101,9 +101,11 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException | ConnectException ex) {
             //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
+            throw new ServerDownException("Server Down!");
 //            System.out.println("IO Exception");
         }
 
@@ -112,9 +114,6 @@ public class PlayerController extends AbstractController {
         return ret;
     }
 
-    public static void continueDuel(long duelID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     private final int TIME_OUT = 300000;
 
@@ -384,7 +383,7 @@ public class PlayerController extends AbstractController {
         }
     }
 
-    public List<Duel> fetchNotifications(String user) {
+    public List<Duel> fetchNotifications(String user) throws ServerDownException {
         List<Duel> ret = new ArrayList<>();
         Socket skClient;
         DataInputStream input;
@@ -429,9 +428,11 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException | ConnectException ex) {
             //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
+            throw new ServerDownException("Server Down!");
 //            System.out.println("IO Exception");
         }
 
@@ -440,7 +441,7 @@ public class PlayerController extends AbstractController {
         return ret;
     }
 
-    public int fetchNotificationNumber(String user) {
+    public int fetchNotificationNumber(String user) throws ServerDownException {
         int ret = 0;
 
         Socket skClient;
@@ -468,9 +469,11 @@ public class PlayerController extends AbstractController {
         } catch (UnknownHostException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException | ConnectException ex) {
             //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
+            throw new ServerDownException("Server Down!");
 //            System.out.println("IO Exception");
         }
 

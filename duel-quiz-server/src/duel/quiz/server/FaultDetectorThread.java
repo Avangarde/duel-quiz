@@ -27,6 +27,8 @@ public class FaultDetectorThread extends Thread {
     private final int TIME_OUT = 5000;
     private final int port = 4455;
     private final String PING = "PING";
+    public static final String NO_DISPONIBLE = "NO_DISPONIBLE";
+    public static final String DISPONIBLE = "DISPONIBLE";
     
     private boolean running;
 
@@ -57,12 +59,14 @@ public class FaultDetectorThread extends Thread {
                         output.writeUTF(PING);
                         System.out.println("Ping to : " + current.getAddress());
                         output.flush();
-                        input.readBoolean();
-
+                        if (input.readBoolean()) {
+                            current.setStatus(DISPONIBLE);
+                        }                            
                         socket.close();
                     } catch (SocketTimeoutException | ConnectException ex) {
                         //@TODO Server Down
                         System.err.println("Server down: " + current.getAddress());
+                        current.setStatus(NO_DISPONIBLE);
                     } catch (IOException ex) {
                         Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
                     }

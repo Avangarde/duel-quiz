@@ -5,6 +5,7 @@
 package duel.quiz.client.controller;
 
 import static duel.quiz.client.controller.AbstractController.PORT;
+import duel.quiz.client.exception.ServerDownException;
 import duel.quiz.client.model.Answer;
 import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Duel;
@@ -14,7 +15,9 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +33,16 @@ public class QuestionController extends AbstractController {
     private static final String NEW_QUESTION = "NEWQUESTION";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
     private static final String GET_ANSWERED_QUESTIONS = "GET_ANSWERED_QUESTIONS";
+    private final int TIME_OUT = 300000;
 
-    public List<String> fetchAllCategories() {
+    public List<String> fetchAllCategories() throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         List<String> listCategories = new ArrayList<String>();
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -57,20 +62,24 @@ public class QuestionController extends AbstractController {
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         //Empty if something went wrong
         return listCategories;
     }
 
-    public boolean createNewQuestion(String categorySelected, String question, String rightAnswer, List<String> wrongAnswers) {
+    public boolean createNewQuestion(String categorySelected, String question, String rightAnswer, List<String> wrongAnswers) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -95,20 +104,24 @@ public class QuestionController extends AbstractController {
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         //Empty if something went wrong
         return true;
     }
 
-    public void transmitPlayedData(Category categorySelected, String user, Duel duel) {
+    public void transmitPlayedData(Category categorySelected, String user, Duel duel) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -144,20 +157,24 @@ public class QuestionController extends AbstractController {
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         //Empty if something went wrong
     }
 
-    public Category getCategorySelected(int duelID, int roundId) {
+    public Category getCategorySelected(int duelID, int roundId) throws ServerDownException {
         Socket skClient;
         DataInputStream input;
         DataOutputStream output;
         Category cat = null;
         try {
             skClient = new Socket(HOST, PORT);
+            skClient.setSoTimeout(TIME_OUT);
             input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
             output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
 
@@ -177,9 +194,12 @@ public class QuestionController extends AbstractController {
         } catch (UnknownHostException ex) {
 //            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Unknown Host");
+        } catch (SocketTimeoutException | ConnectException ex) {
+            //@TODO Server fault 
+            throw new ServerDownException("Server Down!");
         } catch (IOException ex) {
-//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("IO Exception");
+            throw new ServerDownException("Server Down!");
+//            System.out.println("IO Exception");
         }
         //Empty if something went wrong
         return cat;

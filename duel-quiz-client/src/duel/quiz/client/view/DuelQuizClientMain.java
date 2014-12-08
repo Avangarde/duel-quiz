@@ -234,90 +234,105 @@ public class DuelQuizClientMain {
     }
 
     private static void getNotifications() {
-        int nots = new PlayerController(ticket.getServerAddress()).fetchNotificationNumber(currentPlayer.getUser());
-        System.out.println(ConsoleColors.ANSI_GREEN + "You have "+ nots +" notification(s)" + ConsoleColors.ANSI_RESET);
+        try {
+            ticket = TicketController.validateTicket(ticket);
+            int nots = new PlayerController(ticket.getServerAddress()).fetchNotificationNumber(currentPlayer.getUser());
+            System.out.println(ConsoleColors.ANSI_GREEN + "You have " + nots + " notification(s)" + ConsoleColors.ANSI_RESET);
+        } catch (ServerDownException ex) {
+            getNotifications();
+        }
     }
 
     private static void displayNotifications() {
-        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Notifications *****  *****  ****");
-        Integer option = 0;
-        PlayerController controller = new PlayerController(ticket.getServerAddress());
-        List<Duel> nots = controller.fetchNotifications(currentPlayer.getUser());
+        try {
+            System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Notifications *****  *****  ****");
+            Integer option = 0;
+            ticket = TicketController.validateTicket(ticket);
+            PlayerController controller = new PlayerController(ticket.getServerAddress());
+            List<Duel> nots = controller.fetchNotifications(currentPlayer.getUser());
 
-        //int currentIndex = 1;
-        for (Duel each : nots) {
-            //If the game is RUNNING and it is the players turn is displayed on red.
-            //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
-            if (each.getStatus().equals(controller.RUNNING)) {
-                System.out.println(each.getAdversary()  + " has played, it's your turn");
-            }else if (each.getStatus().equals(controller.WAITING)){
-                System.out.println(each.getAdversary()  + " has challenged to a duel, it's your turn");
+            //int currentIndex = 1;
+            for (Duel each : nots) {
+                //If the game is RUNNING and it is the players turn is displayed on red.
+                //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
+                if (each.getStatus().equals(controller.RUNNING)) {
+                    System.out.println(each.getAdversary() + " has played, it's your turn");
+                } else if (each.getStatus().equals(controller.WAITING)) {
+                    System.out.println(each.getAdversary() + " has challenged to a duel, it's your turn");
+                }
             }
-        }
 
-        System.out.println("\nPress any key to continue");
-        readInteger();
+            System.out.println("\nPress any key to continue");
+            readInteger();
+        } catch (ServerDownException ex) {
+            displayNotifications();
+        }
     }
 
     private static void displayCurrentGames() {
-        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Current Games *****  *****  ****");
-        Integer option = 0;
-        List<Duel> games = fetchCurrentGames();
-        //For each game, depending on its conditions display a different action.
-        //If the game is ENDED display in gray, its score displayed :)
-        //If the game is RUNNING but it's not the players turn is displayed on green
-        //If the game is in WAITING but is not your turn, is displayed on green also
+        try {
+            System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/Current Games *****  *****  ****");
+            Integer option = 0;
+            ticket = TicketController.validateTicket(ticket);
+            List<Duel> games = fetchCurrentGames();
+            //For each game, depending on its conditions display a different action.
+            //If the game is ENDED display in gray, its score displayed :)
+            //If the game is in WAITING but is not your turn, is displayed on green also
+            //If the game is in WAITING but is not your turn, is displayed on green also
 
-        //If the game is RUNNING and it is the players turn is displayed on red.
-        //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
-        int exit = games.size() + 1;
-        while (option != exit) {
-            System.out.println("What do you want to do?");
+            //If the game is RUNNING and it is the players turn is displayed on red.
+            //If the game is in WAITING and it is your turn, is displayed on green red and the user must decide whether or not he wants to play
+            int exit = games.size() + 1;
+            while (option != exit) {
+                System.out.println("What do you want to do?");
 
-            int currentIndex = 1;
-            for (Duel each : games) {
-                System.out.print(currentIndex + ", Play against " + each.getAdversary()
-                        + " ( " + each.getPlayer1() + " " + each.getScorePlayer1() + " - "
-                        + each.getPlayer2() + " " + each.getScorePlayer2() + ") - "
-                        + "Round: ");
-                if (each.getCurrentRound() != null ) {
-                    System.out.print(each.getCurrentRound().getRoundId() + " - ");
+                int currentIndex = 1;
+                for (Duel each : games) {
+                    System.out.print(currentIndex + ", Play against " + each.getAdversary()
+                            + " ( " + each.getPlayer1() + " " + each.getScorePlayer1() + " - "
+                            + each.getPlayer2() + " " + each.getScorePlayer2() + ") - "
+                            + "Round: ");
+                    if (each.getCurrentRound() != null) {
+                        System.out.print(each.getCurrentRound().getRoundId() + " - ");
+                    } else {
+                        System.out.print("0 - ");
+                    }
+
+                    if (each.getStatus().equals(PlayerController.ENDED)) {
+                        System.out.println(ConsoleColors.ANSI_PURPLE + "Ended" + ConsoleColors.ANSI_RESET);
+                    }
+                    if (each.getStatus().equals(PlayerController.RUNNING)) {
+                        if (each.getTurn().equals(each.getAdversary())) {
+                            System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary" + ConsoleColors.ANSI_RESET);
+                        } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                            System.out.println(ConsoleColors.ANSI_RED + "It's your turn" + ConsoleColors.ANSI_RESET);
+                        }
+                    }
+                    if (each.getStatus().equals(PlayerController.WAITING)) {
+                        if (each.getTurn().equals(each.getAdversary())) {
+                            System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary to accept" + ConsoleColors.ANSI_RESET);
+                        } else if (each.getTurn().equals(currentPlayer.getUser())) {
+                            System.out.println(ConsoleColors.ANSI_RED + "Accept the challenge to play" + ConsoleColors.ANSI_RESET);
+                        }
+                    }
+                    currentIndex++;
+                }
+
+                System.out.println(exit + ". Go Back\n");
+
+                option = readInteger();
+
+                if (option > 0 && option < exit) {
+                    continueAgainstPlayer(games.get(option - 1));
+                    games = fetchCurrentGames();
+                } else if (option == exit) {
+                    break;
                 } else {
-                    System.out.print("0 - ");
+                    System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
                 }
-                        
-                if (each.getStatus().equals(PlayerController.ENDED)) {
-                    System.out.println(ConsoleColors.ANSI_PURPLE + "Ended" + ConsoleColors.ANSI_RESET);
-                }
-                if (each.getStatus().equals(PlayerController.RUNNING)) {
-                    if (each.getTurn().equals(each.getAdversary())) {
-                        System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary" + ConsoleColors.ANSI_RESET);
-                    } else if (each.getTurn().equals(currentPlayer.getUser())) {
-                        System.out.println(ConsoleColors.ANSI_RED + "It's your turn" + ConsoleColors.ANSI_RESET);
-                    }
-                }
-                if (each.getStatus().equals(PlayerController.WAITING)) {
-                    if (each.getTurn().equals(each.getAdversary())) {
-                        System.out.println(ConsoleColors.ANSI_GREEN + "Waiting for Adversary to accept" + ConsoleColors.ANSI_RESET);
-                    } else if (each.getTurn().equals(currentPlayer.getUser())) {
-                        System.out.println(ConsoleColors.ANSI_RED + "Accept the challenge to play" + ConsoleColors.ANSI_RESET);
-                    }
-                }
-                currentIndex++;
             }
-
-            System.out.println(exit + ". Go Back\n");
-
-            option = readInteger();
-
-            if (option > 0 && option < exit) {
-                continueAgainstPlayer(games.get(option - 1));
-                games = fetchCurrentGames();
-            } else if (option == exit) {
-                break;
-            } else {
-                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
-            }
+        } catch (ServerDownException ex) {
+            displayCurrentGames();
         }
     }
 
@@ -359,12 +374,17 @@ public class DuelQuizClientMain {
     }
 
     private static List<Duel> fetchCurrentGames() {
+        try {
+            //TODO fetch actual gamers, this players are sorted in a particular form
+            ticket = TicketController.validateTicket(ticket);
+            List<Duel> games = new ArrayList<Duel>();
+            games = new PlayerController(ticket.getServerAddress()).getPlayerGames(currentPlayer.getUser());
 
-        //TODO fetch actual gamers, this players are sorted in a particular form
-        List<Duel> games = new ArrayList<Duel>();
-        games = new PlayerController(ticket.getServerAddress()).getPlayerGames(currentPlayer.getUser());
-
-        return games;
+            return games;
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            return fetchCurrentGames();
+        }
     }
 
     private static void challengePlayer(String opponent) {
@@ -392,7 +412,7 @@ public class DuelQuizClientMain {
             if (each.getTurn().equals(each.getAdversary())) {
                 System.out.println(cls + ConsoleColors.ANSI_RED + "Wait for your adversary to play\n" + ConsoleColors.ANSI_RESET);
             } else if (each.getTurn().equals(currentPlayer.getUser())) {
-                System.out.println(cls + ConsoleColors.ANSI_GREEN +  "You chose to battle " + each.getAdversary() + ConsoleColors.ANSI_GREEN);
+                System.out.println(cls + ConsoleColors.ANSI_GREEN + "You chose to battle " + each.getAdversary() + ConsoleColors.ANSI_GREEN);
                 continueDuel(each);
             }
         }
@@ -414,25 +434,25 @@ public class DuelQuizClientMain {
         }
     }
 
-    
     private static void randomChallenge() {
+        Category categorySelected = null;
+        Duel duel = null ;
         try {
             ticket = TicketController.validateTicket(ticket);
+
+            //@TODO request the user for a random Player and get the questions
+            PlayerController playerController = new PlayerController(ticket.getServerAddress());
+            List<Category> round = playerController.obtainCategoryQuestionsAnswers();
+            duel = playerController.getDuel();
+            //Important to pass to server
+            categorySelected = pickCategory(round);
+
+            answerAllQuestions(categorySelected);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
-            return;
+            randomChallenge();
         }
-        //@TODO request the user for a random Player and get the questions
-        PlayerController playerController = new PlayerController(ticket.getServerAddress());
-        List<Category> round = playerController.obtainCategoryQuestionsAnswers();
-        Duel duel = playerController.getDuel();
-        //Important to pass to server
-        Category categorySelected = pickCategory(round);
-
-        answerAllQuestions(categorySelected);
-
-        new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(),duel);
-
+        transmitPlayedData(categorySelected, duel);
     }
 
     /**
@@ -472,55 +492,61 @@ public class DuelQuizClientMain {
     }
 
     private static void suggestQuestion() {
-        //Select Category name //Number
-        System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/SuggestQuestion *****  *****  ****");
-        Integer option = 0;
-        String categorySelected = "";
-        String question = "";
-        String rightAnswer = "";
-        ArrayList<String> wrongAnswers = new ArrayList<String>();
-        QuestionController controller = new QuestionController();
-        List<String> categoryList = controller.fetchAllCategories();
+        try {
+            //Select Category name //Number
+            System.out.println(cls + "****  *****  ***** Duel Quiz/Game Room/SuggestQuestion *****  *****  ****");
+            Integer option = 0;
+            String categorySelected = "";
+            String question = "";
+            String rightAnswer = "";
+            ArrayList<String> wrongAnswers = new ArrayList<String>();
+            QuestionController controller = new QuestionController();
+            ticket = TicketController.validateTicket(ticket);
+            List<String> categoryList = controller.fetchAllCategories();
 
-        int exit = categoryList.size() + 1;
-        while (option != exit) {
+            int exit = categoryList.size() + 1;
+            while (option != exit) {
 
-            System.out.println("Choose a category:\n");
-            int currentIndex = 1;
-            for (String each : categoryList) {
-                System.out.println(currentIndex + ". " + each);
-                currentIndex++;
+                System.out.println("Choose a category:\n");
+                int currentIndex = 1;
+                for (String each : categoryList) {
+                    System.out.println(currentIndex + ". " + each);
+                    currentIndex++;
+                }
+
+                System.out.println(exit + ". Go Back\n");
+
+                option = readInteger();
+
+                if (option >= 0 && option < exit) {
+                    categorySelected = categoryList.get(option);
+                    System.out.println("Enter question:\n");
+                    question = readString();
+                    System.out.println("Enter right answer:\n");
+                    rightAnswer = readString();
+                    System.out.println("Enter wrong answers:\n");
+                    System.out.println("1:\n");
+                    wrongAnswers.add(readString());
+                    System.out.println("2:\n");
+                    wrongAnswers.add(readString());
+                    System.out.println("3:\n");
+                    wrongAnswers.add(readString());
+
+                    controller.createNewQuestion(categorySelected, question, rightAnswer, wrongAnswers);
+
+                } else if (option == exit) {
+                    break;
+                } else {
+                    System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
+                }
             }
-
-            System.out.println(exit + ". Go Back\n");
-
-            option = readInteger();
-
-            if (option >= 0 && option < exit) {
-                categorySelected = categoryList.get(option);
-                System.out.println("Enter question:\n");
-                question = readString();
-                System.out.println("Enter right answer:\n");
-                rightAnswer = readString();
-                System.out.println("Enter wrong answers:\n");
-                System.out.println("1:\n");
-                wrongAnswers.add(readString());
-                System.out.println("2:\n");
-                wrongAnswers.add(readString());
-                System.out.println("3:\n");
-                wrongAnswers.add(readString());
-
-                controller.createNewQuestion(categorySelected, question, rightAnswer, wrongAnswers);
-
-            } else if (option == exit) {
-                break;
-            } else {
-                System.out.println(ConsoleColors.ANSI_RED + "Invalid Option" + ConsoleColors.ANSI_RESET);
-            }
+            //Suggest Question
+            //Correct Answer
+            //Other answers
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            suggestQuestion();
         }
-        //Suggest Question
-        //Correct Answer
-        //Other answers
 
     }
 
@@ -618,21 +644,31 @@ public class DuelQuizClientMain {
             List<Category> round = playerController.getQuestions();
             Category categorySelected;
             if (duel.getCurrentRound() == null) {
-                categorySelected = pickCategory(round);                
+                categorySelected = pickCategory(round);
             } else {
                 if (duel.getCurrentRound().isP1Hasplayed()
                         && !duel.getCurrentRound().isP2Hasplayed()) {
-                    categorySelected = new QuestionController().getCategorySelected(duel.getDuelID(), 
+                    categorySelected = new QuestionController().getCategorySelected(duel.getDuelID(),
                             duel.getCurrentRound().getRoundId());
                 } else {
                     categorySelected = pickCategory(round);
                 }
             }
             answerAllQuestions(categorySelected);
-            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(),duel);
+            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(), duel);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
             return;
+        }
+    }
+
+    private static void transmitPlayedData(Category categorySelected, Duel duel) {
+        try {
+            ticket = TicketController.validateTicket(ticket);
+            new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(), duel);
+        } catch (ServerDownException ex) {
+            System.err.println("Server down :(");
+            transmitPlayedData(categorySelected, duel);
         }
     }
 }

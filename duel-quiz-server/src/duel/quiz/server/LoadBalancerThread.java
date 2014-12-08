@@ -33,6 +33,7 @@ public class LoadBalancerThread extends Thread {
     private static final String GET_CLIENTS = "GET CLIENTS";
     private static final String ADD_CLIENT = "ADD CLIENT";
     private static final String GET_PLAYERS = "GET PLAYERS";
+    public static final String DISPONIBLE = "DISPONIBLE";
 
     public LoadBalancerThread(Server server) throws IOException {
         this("FaultDetectorThread", server);
@@ -192,32 +193,34 @@ public class LoadBalancerThread extends Thread {
         int portToServer = 5000;
         while (iterator.hasNext()) {
             Server current = iterator.next();
-            try {
-                socketToServer = new Socket(current.getAddress(), portToServer);
-                socketToServer.setSoTimeout(TIME_OUT);
-                DataInputStream input = new DataInputStream(new BufferedInputStream(socketToServer.getInputStream()));
-                DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socketToServer.getOutputStream()));
+            if (current.getStatus().equals(DISPONIBLE)) {
+                try {
+                    socketToServer = new Socket(current.getAddress(), portToServer);
+                    socketToServer.setSoTimeout(TIME_OUT);
+                    DataInputStream input = new DataInputStream(new BufferedInputStream(socketToServer.getInputStream()));
+                    DataOutputStream output = new DataOutputStream(new BufferedOutputStream(socketToServer.getOutputStream()));
 
-                //Sending request to server
-                output.writeUTF(GET_CLIENTS);
-                System.out.println("Getting clients from : " + current.getAddress());
-                output.flush();
-                int numClients = input.readInt();
-                current.setNumberOfClients(numClients);
-                for (int i = 0; i < numClients; i++) {
-                    input.readUTF();
+                    //Sending request to server
+                    output.writeUTF(GET_CLIENTS);
+                    System.out.println("Getting clients from : " + current.getAddress());
+                    output.flush();
+                    int numClients = input.readInt();
+                    current.setNumberOfClients(numClients);
+                    for (int i = 0; i < numClients; i++) {
+                        input.readUTF();
+                    }
+                    input.readBoolean();
+                    
+                    if (current.getNumberOfClients() < minCharged.getNumberOfClients()) {
+                        minCharged = current;
+                    }
+                    socketToServer.close();
+                } catch (SocketTimeoutException | ConnectException ex) {
+                    //@TODO Server Down
+                    System.err.println("Server down: " + current.getAddress());
+                } catch (IOException ex) {
+                    Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                input.readBoolean();
-
-                if (current.getNumberOfClients() < minCharged.getNumberOfClients()) {
-                    minCharged = current;
-                }
-                socketToServer.close();
-            } catch (SocketTimeoutException | ConnectException ex) {
-                //@TODO Server Down
-                System.err.println("Server down: " + current.getAddress());
-            } catch (IOException ex) {
-                Logger.getLogger(FaultDetectorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         //Send message to update number of clients of server
