@@ -224,4 +224,39 @@ public class PlayerDAO extends AbstractDataBaseDAO {
         }
         return ret;
     }
+
+    public static void updatePlayerScore(String user, int duelId, int player) {
+        Connection conn = null;
+        try {
+            conn = connect();
+            PreparedStatement stmt1;
+            if (player == 1) {
+                stmt1 = conn.prepareStatement("SELECT scorePlayer1 FROM duel where duelId = ?");
+            } else {
+                stmt1 = conn.prepareStatement("SELECT scorePlayer2 FROM duel where duelId = ?");
+            }
+            stmt1.setInt(1, duelId);
+            ResultSet rs = stmt1.executeQuery();
+            int score = 0;
+            if (rs.next()) {
+                score = rs.getInt(0);
+            }
+            
+            PreparedStatement stmt = conn.prepareStatement("UPDATE Player SET score = ?"
+                    + "WHERE username = ?");
+            stmt.setInt(1, score);
+            stmt.setString(2, user);
+            int rset = stmt.executeUpdate();
+           
+            stmt.close();
+        } catch (SQLException e) {
+            Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            try {
+                closeConnection(conn);
+            } catch (SQLException ex) {
+                Logger.getLogger(PlayerDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 }

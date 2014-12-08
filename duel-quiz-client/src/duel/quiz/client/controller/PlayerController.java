@@ -11,6 +11,7 @@ import duel.quiz.client.model.Category;
 import duel.quiz.client.model.Duel;
 import duel.quiz.client.model.Player;
 import duel.quiz.client.model.Question;
+import duel.quiz.client.model.Round;
 import duel.quiz.client.view.DuelQuizClientMain;
 
 import java.io.*;
@@ -82,6 +83,16 @@ public class PlayerController extends AbstractController {
                 temp.setAdversary(input.readUTF());
                 temp.setPlayer1(input.readUTF());
                 temp.setPlayer2(input.readUTF());
+                
+                if (input.readBoolean()) {
+                    //Get current round
+                    Round round = new Round(input.readInt());
+                    round.setCategoryName(input.readUTF());
+                    round.setP1Hasplayed(input.readBoolean());
+                    round.setP2Hasplayed(input.readBoolean());
+                    temp.setCurrentRound(round);
+                }
+                
                 ret.add(temp);
 
             }

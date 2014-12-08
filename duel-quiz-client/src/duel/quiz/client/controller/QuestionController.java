@@ -29,6 +29,7 @@ public class QuestionController extends AbstractController {
     private static final String NO_MORE_CATEGORIES = "ENDOFDATA";
     private static final String NEW_QUESTION = "NEWQUESTION";
     private static final String SENDING_ROUND_DATA = "SENDINGROUNDDATA";
+    private static final String GET_ANSWERED_QUESTIONS = "GET_ANSWERED_QUESTIONS";
 
     public List<String> fetchAllCategories() {
         Socket skClient;
@@ -148,5 +149,50 @@ public class QuestionController extends AbstractController {
             System.out.println("IO Exception");
         }
         //Empty if something went wrong
+    }
+
+    public Category getCategorySelected(int duelID, int roundId) {
+        Socket skClient;
+        DataInputStream input;
+        DataOutputStream output;
+        Category cat = null;
+        try {
+            skClient = new Socket(HOST, PORT);
+            input = new DataInputStream(new BufferedInputStream(skClient.getInputStream()));
+            output = new DataOutputStream(new BufferedOutputStream(skClient.getOutputStream()));
+
+            //Sending request for categories
+            output.writeUTF(GET_ANSWERED_QUESTIONS);
+            output.writeInt(duelID);
+            output.writeInt(roundId);
+            output.flush();
+            
+            cat = new Category(input.readUTF());
+            List<Question> questions = new ArrayList<>(3);
+            readQuestions(input, cat, questions);
+            cat.setListQuestions(questions);
+
+
+            skClient.close();
+        } catch (UnknownHostException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown Host");
+        } catch (IOException ex) {
+//            Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IO Exception");
+        }
+        //Empty if something went wrong
+        return cat;
+    }
+    
+    private void readQuestions(DataInputStream input, Category category, List<Question> questions) throws IOException {
+        for (int i = 0; i < 3; i++) {
+            Question question = new Question(-1, input.readUTF(), category);
+            questions.add(question);
+            for (int j = 0; j < 4; j++) {
+                Answer answer = new Answer(input.readLong(), input.readUTF(), input.readBoolean(), question);
+                question.getAnswers().add(answer);
+            }
+        }
     }
 }

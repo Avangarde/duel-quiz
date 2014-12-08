@@ -10,6 +10,7 @@ import duel.quiz.server.model.Question;
 import duel.quiz.server.model.Round;
 import duel.quiz.server.model.dao.AnswerDAO;
 import duel.quiz.server.model.dao.DuelDAO;
+import duel.quiz.server.model.dao.PlayerDAO;
 import java.util.List;
 import duel.quiz.server.model.dao.QuestionDAO;
 import duel.quiz.server.model.dao.RoundDAO;
@@ -248,25 +249,34 @@ public class QuestionController {
             //Round
             Round round = RoundDAO.findMaxRound(duelID);
             int roundID;
+            int player;
+            boolean end = false;
             //If there are no rounds, then create the first one
             if (round == null) {
+                player = 1;
                 roundID = 1;
                 RoundDAO.create(duelID, roundID, ret.getName());
+                DuelDAO.updateStatus("En cours", duelID);
+                DuelDAO.updateActivePlayer(adversary, duelID);
             } else { 
                 roundID = round.getRoundID();
                 if (round.isP1HasPlayed() && !round.isP2HasPlayed()) {
                     //If only one, update the other 
+                    player = 2;
                     RoundDAO.updateP2(duelID,roundID);
                     DuelDAO.updateActivePlayer(adversary, duelID);
-                } else {
                     //If last round, then game over
-                    if (round.getDuel().getDuelID() == 6) {
+                    if (round.getRoundID() == 6) {
                         //TODO inform the players
+                        end = true;
+                        DuelDAO.updateStatus("Fini", duelID);
                         System.out.println("Game Over");
-                    } else {
-                        //If both players had answered, then create a new round
-                        RoundDAO.create(duelID, ++roundID, ret.getName());
                     }
+                } else {                                        
+                    //If both players had answered, then create a new round
+                    player = 1;
+                    RoundDAO.create(duelID, ++roundID, ret.getName());
+                    DuelDAO.updateActivePlayer(adversary, duelID);
                 }
             }
             
@@ -280,11 +290,19 @@ public class QuestionController {
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(1).getAnswerID(),duelID,roundID);
             AnswerDAO.linkPlayerToAnswer(user, answersToPersist.get(2).getAnswerID(),duelID,roundID);
 
-            int player = 1;
+            
             int score = countCorrectAnswers(answersToPersist);
             //Update Duel points
             DuelDAO.updateScore(duelID, score, player);
             DuelDAO.updateActivePlayer(adversary, duelID);
+            if (end) {
+                PlayerDAO.updatePlayerScore(user, duelID, player);
+                if (player == 1) {
+                    PlayerDAO.updatePlayerScore(adversary, duelID, 2);
+                } else {
+                    PlayerDAO.updatePlayerScore(adversary, duelID, 1);
+                }                
+            }
 
             out.writeUTF("OK");
         } catch (IOException ex) {
@@ -301,5 +319,21 @@ public class QuestionController {
             }
         }
         return sum;
+    }
+
+    public static void sendAnsweredQuestions(DataOutputStream out, DataInputStream in, int duel, int round) {
+        List<Question> questions = QuestionDAO.getQuestionsByRound(duel, round);
+        Category cat = new Category(questions.get(0).getCategoryName().getName());
+        cat.setListQuestions(questions);
+        
+        setAnswers(questions);
+        
+        try {
+            out.writeUTF(cat.getName());
+            writeQuestions(questions, out);
+            out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(QuestionController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

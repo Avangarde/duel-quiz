@@ -164,4 +164,36 @@ public class QuestionDAO extends AbstractDataBaseDAO {
         }
         return ret;
     }
+
+    public static List<Question> getQuestionsByRound(int duel, int round) {
+        List<Question> questions = null;
+        Connection connection = connect();
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("SELECT * FROM roundquestion rq, question q "
+                    + "WHERE rq.questionid = q.questionid and duelId = ? and roundId = ?");
+            ps.setInt(1, duel);
+            ps.setInt(2, round);
+            try (ResultSet resultSet = ps.executeQuery()) {
+                questions = new ArrayList<>();
+                while (resultSet.next()) {
+                    questions.add(new Question(
+                            resultSet.getLong("questionId"),
+                            resultSet.getString("question"),
+                            new Category(resultSet.getString("categoryName"))));
+                }
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                closeConnection(connection);
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return questions;
+    }
 }

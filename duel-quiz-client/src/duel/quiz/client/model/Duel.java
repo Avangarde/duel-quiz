@@ -19,6 +19,8 @@ public class Duel {
     private String adversary;
     private String player1;
     private String player2;
+    
+    private Round currentRound;
 
     public String getAdversary() {
         return adversary;
@@ -102,6 +104,14 @@ public class Duel {
     
     public Duel() {
         
+    }
+
+    public Round getCurrentRound() {
+        return currentRound;
+    }
+
+    public void setCurrentRound(Round currentRound) {
+        this.currentRound = currentRound;
     }
     
     

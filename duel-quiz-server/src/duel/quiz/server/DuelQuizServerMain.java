@@ -42,6 +42,7 @@ public class DuelQuizServerMain implements Runnable {
     private static final String GET_QUESTIONS = "GET QUESTIONS";
     private static final String GET_NOTIFICATION_SIZE = "GETNOTSIZE";
     private static final String GET_NOTIFICATIONS = "GETNOTIFICATIONS";
+    private static final String GET_ANSWERED_QUESTIONS = "GET_ANSWERED_QUESTIONS";
     private static final String WAITING = "En Attente";
     private static PlayerController playerController;
 
@@ -173,8 +174,8 @@ public class DuelQuizServerMain implements Runnable {
                 }
                 //Save in the database the duel with the players (create returns the duel's id)
                 int idDuel = DuelDAO.create("En Attente", usr);
-                DuelDAO.linkPlayerToDuel(usr, idDuel);
                 DuelDAO.linkPlayerToDuel(adv.getUser(), idDuel);
+                DuelDAO.linkPlayerToDuel(usr, idDuel);
                 //Send to the user the adversary and the duel id
                 out.writeUTF(adv.getUser());
                 out.writeInt(idDuel);
@@ -239,6 +240,12 @@ public class DuelQuizServerMain implements Runnable {
                 break;
             case GET_QUESTIONS:
                 QuestionController.sendNewQuestions(out, in);
+                break;
+            case GET_ANSWERED_QUESTIONS:
+                int duel = in.readInt();
+                int round = in.readInt();
+                QuestionController.sendAnsweredQuestions(out, in, duel, round);
+                
                 break;
             default:
                 //the message is not compliant with any other message

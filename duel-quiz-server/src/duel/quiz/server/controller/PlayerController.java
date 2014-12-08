@@ -8,9 +8,11 @@ package duel.quiz.server.controller;
 import duel.quiz.server.Server;
 import duel.quiz.server.model.Duel;
 import duel.quiz.server.model.Player;
+import duel.quiz.server.model.Round;
 import duel.quiz.server.model.Ticket;
 import duel.quiz.server.model.dao.DuelDAO;
 import duel.quiz.server.model.dao.PlayerDAO;
+import duel.quiz.server.model.dao.RoundDAO;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -201,7 +203,18 @@ public class PlayerController implements Runnable {
 //                out.writeUTF("other");
 
                 out.writeUTF(temp.getPlayer2());
-
+                
+                Round round = RoundDAO.findMaxRound(temp.getDuelID());
+                if (round != null) {
+                    out.writeBoolean(true);
+                    out.writeInt(round.getRoundID());
+                    out.writeUTF(round.getCategoryName().getName());
+                    out.writeBoolean(round.isP1HasPlayed());
+                    out.writeBoolean(round.isP2HasPlayed());
+                } else {
+                    out.writeBoolean(false);
+                }
+                
             }
         } catch (IOException ex) {
             Logger.getLogger(PlayerController.class.getName()).log(Level.SEVERE, null, ex);

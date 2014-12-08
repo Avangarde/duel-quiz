@@ -278,7 +278,14 @@ public class DuelQuizClientMain {
             for (Duel each : games) {
                 System.out.print(currentIndex + ", Play against " + each.getAdversary()
                         + " ( " + each.getPlayer1() + " " + each.getScorePlayer1() + " - "
-                        + each.getPlayer2() + " " + each.getScorePlayer2() + ") - ");
+                        + each.getPlayer2() + " " + each.getScorePlayer2() + ") - "
+                        + "Round: ");
+                if (each.getCurrentRound() != null ) {
+                    System.out.print(each.getCurrentRound().getRoundId() + " - ");
+                } else {
+                    System.out.print("0 - ");
+                }
+                        
                 if (each.getStatus().equals(PlayerController.ENDED)) {
                     System.out.println(ConsoleColors.ANSI_PURPLE + "Ended" + ConsoleColors.ANSI_RESET);
                 }
@@ -305,6 +312,7 @@ public class DuelQuizClientMain {
 
             if (option > 0 && option < exit) {
                 continueAgainstPlayer(games.get(option - 1));
+                games = fetchCurrentGames();
             } else if (option == exit) {
                 break;
             } else {
@@ -608,11 +616,19 @@ public class DuelQuizClientMain {
 
             PlayerController playerController = new PlayerController(ticket.getServerAddress());
             List<Category> round = playerController.getQuestions();
-            //Important to pass to server
-            Category categorySelected = pickCategory(round);
-
+            Category categorySelected;
+            if (duel.getCurrentRound() == null) {
+                categorySelected = pickCategory(round);                
+            } else {
+                if (duel.getCurrentRound().isP1Hasplayed()
+                        && !duel.getCurrentRound().isP2Hasplayed()) {
+                    categorySelected = new QuestionController().getCategorySelected(duel.getDuelID(), 
+                            duel.getCurrentRound().getRoundId());
+                } else {
+                    categorySelected = pickCategory(round);
+                }
+            }
             answerAllQuestions(categorySelected);
-
             new QuestionController().transmitPlayedData(categorySelected, currentPlayer.getUser(),duel);
         } catch (ServerDownException ex) {
             System.err.println("Server down :(");
