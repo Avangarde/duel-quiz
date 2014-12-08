@@ -26,7 +26,7 @@ public class DuelDAO extends AbstractDataBaseDAO {
 
     public static final String ENDED = "Fini";
     public static final String RUNNING = "En cours";
-    public static final String WAITING = "En attente";
+    public static final String WAITING = "En Attente";
 
     public static int create(String status, String turn) {
 

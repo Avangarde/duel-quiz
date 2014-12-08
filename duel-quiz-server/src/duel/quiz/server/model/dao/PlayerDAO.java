@@ -239,7 +239,7 @@ public class PlayerDAO extends AbstractDataBaseDAO {
             ResultSet rs = stmt1.executeQuery();
             int score = 0;
             if (rs.next()) {
-                score = rs.getInt(0);
+                score = rs.getInt(1);
             }
             
             PreparedStatement stmt = conn.prepareStatement("UPDATE Player SET score = ?"

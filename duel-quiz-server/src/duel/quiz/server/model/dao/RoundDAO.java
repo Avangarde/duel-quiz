@@ -83,7 +83,7 @@ public class RoundDAO extends AbstractDataBaseDAO {
         Connection connection = connect();
         Round r = null;
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ROUND WHERE DUELID = ? HAVING ROUNDID = (SELECT MAX(ROUNDID) FROM ROUND WHERE DUELID=?)");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ROUND WHERE DUELID = ? AND ROUNDID = (SELECT MAX(ROUNDID) FROM ROUND WHERE DUELID=?)");
             ps.setInt(1, duelID);
             ps.setInt(2, duelID);
             ResultSet rs = ps.executeQuery();

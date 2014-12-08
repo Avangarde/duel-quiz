@@ -257,6 +257,7 @@ public class QuestionController {
                 roundID = 1;
                 RoundDAO.create(duelID, roundID, ret.getName());
                 DuelDAO.updateStatus("En cours", duelID);
+                //Problem                
                 DuelDAO.updateActivePlayer(adversary, duelID);
             } else { 
                 roundID = round.getRoundID();
@@ -264,6 +265,7 @@ public class QuestionController {
                     //If only one, update the other 
                     player = 2;
                     RoundDAO.updateP2(duelID,roundID);
+                    //Problem
                     DuelDAO.updateActivePlayer(adversary, duelID);
                     //If last round, then game over
                     if (round.getRoundID() == 6) {
